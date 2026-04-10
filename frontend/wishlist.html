@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>My Wishlist | Smart Shop</title>
+    <meta name="description" content="Your saved items on Smart Shop"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="./js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="bg-surface font-body text-on-surface antialiased flex flex-col min-h-screen">
+
+    <header class="fixed top-0 w-full z-50" id="navbar"></header>
+
+    <main class="pt-28 md:pt-32 pb-24 max-w-7xl mx-auto w-full px-4 md:px-8 flex-grow animate-fade-up">
+        
+        <div class="flex items-end justify-between mb-10 md:mb-14">
+            <div>
+                <h1 class="text-3xl md:text-5xl font-extrabold tracking-tighter text-on-surface mb-2 flex items-center gap-3">
+                    My Wishlist
+                    <span class="material-symbols-outlined text-pink-500 filled-icon" style="font-size:36px; font-variation-settings: 'FILL' 1;">favorite</span>
+                </h1>
+                <p id="wishlist-count" class="text-on-surface-variant text-base md:text-lg">0 items saved</p>
+            </div>
+        </div>
+
+        <div id="wishlist-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5">
+        </div>
+        
+        <div id="wishlist-empty" class="hidden">
+            <div class="empty-state bg-surface-container-lowest rounded-lg">
+                <div class="empty-state-icon" style="background: rgba(236, 72, 153, 0.08);">
+                    <span class="material-symbols-outlined text-[40px] text-pink-300">favorite</span>
+                </div>
+                <h3 class="text-2xl font-black text-on-surface mb-2">Your wishlist is empty</h3>
+                <p class="text-on-surface-variant font-medium mb-8">Save items you love by clicking the heart icon.</p>
+                <a href="shop.html" class="btn-primary">Explore Products</a>
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer-container"></footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function renderWishlist() {
+            const container = document.getElementById('wishlist-container');
+            const emptyState = document.getElementById('wishlist-empty');
+            const countLabel = document.getElementById('wishlist-count');
+            const wishlist = getWishlist();
+            
+            if (wishlist.length === 0) {
+                container.style.display = 'none';
+                emptyState.classList.remove('hidden');
+                countLabel.textContent = '0 items saved';
+                return;
+            }
+            
+            container.style.display = '';
+            emptyState.classList.add('hidden');
+            countLabel.textContent = `${wishlist.length} item${wishlist.length > 1 ? 's' : ''} saved`;
+            
+            container.innerHTML = '';
+            wishlist.forEach((productId, idx) => {
+                const product = getProductById(productId);
+                if (!product) return;
+                
+                const wrapper = document.createElement('div');
+                wrapper.style.opacity = '0';
+                wrapper.style.animation = `fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 60}ms forwards`;
+                wrapper.innerHTML = generateProductCard(product);
+                container.appendChild(wrapper);
+            });
+            
+            updateWishlistButtons();
+            
+            container.querySelectorAll('.wishlist-btn').forEach(btn => {
+                const originalOnclick = btn.getAttribute('onclick');
+                btn.setAttribute('onclick', originalOnclick + '; setTimeout(() => renderWishlist(), 100);');
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', renderWishlist);
+    </script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>My Orders | Smart Shop</title>
+    <meta name="description" content="Track your Smart Shop orders"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="./js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="bg-surface font-body text-on-surface antialiased flex flex-col min-h-screen">
+
+    <header class="fixed top-0 w-full z-50" id="navbar"></header>
+
+    <main class="pt-28 md:pt-32 pb-24 max-w-[1100px] mx-auto w-full px-4 md:px-8 flex-grow animate-fade-up">
+        
+        <div class="flex items-end justify-between mb-10 md:mb-14">
+            <div>
+                <h1 class="text-3xl md:text-5xl font-extrabold tracking-tighter text-on-surface mb-2">My Orders</h1>
+                <p class="text-on-surface-variant text-base md:text-lg">Track and manage your purchases</p>
+            </div>
+            <a href="shop.html" class="btn-primary text-sm px-6 py-3 hidden md:flex">
+                <span class="material-symbols-outlined text-sm">add</span> Shop More
+            </a>
+        </div>
+
+        <div id="orders-container">
+        </div>
+    </main>
+
+    <footer id="footer-container"></footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('orders-container');
+            const orders = getOrders();
+            
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state bg-surface-container-lowest rounded-lg">
+                        <div class="empty-state-icon">
+                            <span class="material-symbols-outlined text-[40px] text-on-surface-variant">receipt_long</span>
+                        </div>
+                        <h3 class="text-2xl font-black text-on-surface mb-2">No orders yet</h3>
+                        <p class="text-on-surface-variant font-medium mb-8">Start shopping to see your orders here.</p>
+                        <a href="shop.html" class="btn-primary">Start Shopping</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Refresh order statuses
+            orders.forEach(order => {
+                const elapsed = Date.now() - new Date(order.date).getTime();
+                const stepDelays = [0, 10000, 25000, 45000, 70000];
+                const statuses = ['Ordered', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'];
+                
+                for (let i = 0; i < stepDelays.length; i++) {
+                    if (elapsed >= stepDelays[i]) {
+                        order.trackingSteps[i].completed = true;
+                        if (!order.trackingSteps[i].date) {
+                            order.trackingSteps[i].date = new Date(new Date(order.date).getTime() + stepDelays[i]).toISOString();
+                        }
+                        order.status = statuses[i];
+                    }
+                }
+            });
+            saveOrders(orders);
+            
+            orders.forEach((order, orderIdx) => {
+                const statusColor = order.status === 'Delivered' ? 'badge-success' : 
+                                    order.status === 'Shipped' || order.status === 'Out for Delivery' ? 'badge-primary' : 
+                                    'badge-warning';
+                const statusIcon = order.status === 'Delivered' ? 'check_circle' : 
+                                   order.status === 'Shipped' ? 'local_shipping' :
+                                   order.status === 'Out for Delivery' ? 'delivery_dining' :
+                                   order.status === 'Packed' ? 'inventory_2' : 'receipt';
+                
+                const tax = Math.round(order.total * 0.18);
+                                   
+                container.innerHTML += `
+                    <div class="bg-surface-container-lowest rounded-lg p-6 md:p-8 shadow-sm mb-6 animate-fade-up" style="animation-delay: ${orderIdx * 100}ms">
+                        <!-- Order Header -->
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-6 border-b border-outline-variant/15">
+                            <div>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="font-extrabold text-lg text-on-surface">${order.id}</h3>
+                                    <span class="badge ${statusColor} flex items-center gap-1">
+                                        <span class="material-symbols-outlined" style="font-size:14px;">${statusIcon}</span>
+                                        ${order.status}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-on-surface-variant font-medium">
+                                    Ordered on ${new Date(order.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                    &middot; ${order.items.length} item${order.items.length > 1 ? 's' : ''}
+                                    &middot; Total: <span class="font-bold text-on-surface">${formatPrice(order.total + tax)}</span>
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-on-surface-variant font-medium">Expected Delivery</p>
+                                <p class="font-bold text-on-surface">${new Date(order.deliveryDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Order Items -->
+                        <div class="space-y-3 mb-6">
+                            ${order.items.map(item => `
+                                <div class="flex items-center gap-4 cursor-pointer hover:bg-surface-container-low rounded-md p-2 -mx-2 transition-colors" onclick="window.location.href='product.html?id=${item.productId}'">
+                                    <div class="w-14 h-14 bg-surface-container-low rounded-md overflow-hidden p-2 flex-shrink-0">
+                                        <img src="${item.image}" alt="${item.name}" class="w-full h-full object-contain" style="mix-blend-mode: multiply;"/>
+                                    </div>
+                                    <div class="flex-grow min-w-0">
+                                        <h4 class="font-bold text-sm text-on-surface truncate">${item.name}</h4>
+                                        <span class="text-xs text-on-surface-variant">${item.brand} &middot; Qty: ${item.quantity}</span>
+                                    </div>
+                                    <span class="font-bold text-on-surface flex-shrink-0 text-sm">${formatPrice(item.price * item.quantity)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <!-- Order Tracking -->
+                        <div class="bg-surface-container-low rounded-md p-5 md:p-6">
+                            <h4 class="font-bold text-xs text-on-surface uppercase tracking-widest mb-5 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary" style="font-size:18px;">timeline</span>
+                                Order Tracking
+                            </h4>
+                            <div class="space-y-0">
+                                ${order.trackingSteps.map((step, idx) => {
+                                    const isLast = idx === order.trackingSteps.length - 1;
+                                    const isCurrent = step.completed && (isLast || !order.trackingSteps[idx + 1].completed);
+                                    const dotClass = step.completed ? (isCurrent ? 'current' : 'completed') : 'pending';
+                                    const stepClass = step.completed && !isLast && order.trackingSteps[idx + 1]?.completed ? 'completed' : '';
+                                    const icons = ['receipt', 'inventory_2', 'local_shipping', 'delivery_dining', 'check_circle'];
+                                    
+                                    return `
+                                        <div class="tracking-step ${stepClass} flex gap-4 pb-6 ${isLast ? 'pb-0' : ''}">
+                                            <div class="tracking-dot ${dotClass}">
+                                                <span class="material-symbols-outlined" style="font-size:20px; ${step.completed ? "font-variation-settings: 'FILL' 1;" : ''}">${icons[idx]}</span>
+                                            </div>
+                                            <div class="pt-2">
+                                                <h5 class="font-bold text-sm ${step.completed ? 'text-on-surface' : 'text-on-surface-variant'}">${step.status}</h5>
+                                                ${step.date ? `<p class="text-xs text-on-surface-variant mt-0.5">${new Date(step.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>` : '<p class="text-xs text-outline mt-0.5">Pending</p>'}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>My Profile | Smart Shop</title>
+    <meta name="description" content="Manage your Smart Shop profile"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="./js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="bg-surface font-body text-on-surface antialiased flex flex-col min-h-screen">
+
+    <header class="fixed top-0 w-full z-50" id="navbar"></header>
+
+    <main class="pt-28 md:pt-32 pb-24 max-w-[900px] mx-auto w-full px-4 md:px-8 flex-grow">
+        
+        <!-- Profile Header -->
+        <div class="bg-surface-container-lowest rounded-lg p-8 md:p-10 mb-6 text-center shadow-sm relative">
+            <div class="avatar-lg mx-auto mb-4" id="profile-avatar">U</div>
+            <h1 id="profile-name" class="text-2xl md:text-3xl font-extrabold text-on-surface mb-1">User</h1>
+            <p id="profile-email" class="text-on-surface-variant text-sm mb-8">user@smartshop.in</p>
+            
+            <div class="flex justify-center gap-12 md:gap-20">
+                <div class="text-center">
+                    <span id="stat-orders" class="text-3xl font-black text-on-surface block">0</span>
+                    <p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest mt-1">Orders</p>
+                </div>
+                <div class="text-center">
+                    <span id="stat-wishlist" class="text-3xl font-black text-on-surface block">0</span>
+                    <p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest mt-1">Wishlist</p>
+                </div>
+                <div class="text-center">
+                    <span id="stat-cart" class="text-3xl font-black text-on-surface block">0</span>
+                    <p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest mt-1">In Cart</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ══════════════════════════════════════════
+             FIX #3: Profile Form with Edit Toggle
+             ══════════════════════════════════════════ -->
+        <div class="bg-surface-container-lowest rounded-lg p-6 md:p-8 mb-6 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-bold text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">person</span> Personal Information
+                </h2>
+                <!-- Edit Button (visible after saving) -->
+                <button id="edit-btn" onclick="enableEdit()" style="display: none;" class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary-fixed text-primary font-bold text-sm hover:bg-primary-fixed-dim transition-all cursor-pointer border-none">
+                    <span class="material-symbols-outlined text-sm">edit</span> Edit
+                </button>
+            </div>
+            
+            <form id="profile-form" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="p-name" class="form-input" placeholder="Your full name"/>
+                    </div>
+                    <div>
+                        <label class="form-label">Email</label>
+                        <input type="email" id="p-email" class="form-input" placeholder="your@email.com"/>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="form-label">Phone</label>
+                        <input type="tel" id="p-phone" class="form-input" placeholder="+91 98765 43210"/>
+                    </div>
+                    <div>
+                        <label class="form-label">City</label>
+                        <input type="text" id="p-city" class="form-input" placeholder="Mumbai"/>
+                    </div>
+                </div>
+                
+                <!-- Address Field -->
+                <div>
+                    <label class="form-label">Delivery Address</label>
+                    <input type="text" id="p-address" class="form-input" placeholder="123, MG Road, Sector 5"/>
+                </div>
+                
+                <div class="flex items-center gap-3 pt-2">
+                    <button type="submit" id="save-btn" class="btn-primary text-sm px-8 py-3 gap-2">
+                        <span class="material-symbols-outlined text-sm">save</span> Save Changes
+                    </button>
+                    <span id="save-status" class="text-sm text-green-600 font-bold hidden">
+                        <span class="material-symbols-outlined text-sm align-middle">check_circle</span> Saved!
+                    </span>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Quick Links -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <a href="orders.html" class="bg-surface-container-lowest rounded-lg p-5 hover-lift cursor-pointer flex items-center gap-4 shadow-sm group">
+                <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-primary">local_shipping</span>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm text-on-surface">My Orders</h3>
+                    <p class="text-xs text-on-surface-variant">Track purchases</p>
+                </div>
+            </a>
+            <a href="wishlist.html" class="bg-surface-container-lowest rounded-lg p-5 hover-lift cursor-pointer flex items-center gap-4 shadow-sm group">
+                <div class="w-12 h-12 rounded-full bg-pink-50 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-pink-500">favorite</span>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm text-on-surface">Wishlist</h3>
+                    <p class="text-xs text-on-surface-variant">Saved items</p>
+                </div>
+            </a>
+            <a href="cart.html" class="bg-surface-container-lowest rounded-lg p-5 hover-lift cursor-pointer flex items-center gap-4 shadow-sm group">
+                <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-green-500">shopping_cart</span>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm text-on-surface">Cart</h3>
+                    <p class="text-xs text-on-surface-variant">View your bag</p>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Account Actions -->
+        <div class="bg-surface-container-lowest rounded-lg p-6 shadow-sm">
+            <h3 class="text-xs font-bold text-error uppercase tracking-widest mb-4">Account Actions</h3>
+            <div class="flex flex-wrap gap-3">
+                <button onclick="if(confirm('Clear all data? This cannot be undone.')) { localStorage.clear(); window.location.href='index.html'; }" class="btn-outline text-error border-error/20 hover:bg-error-container/20 text-sm px-5 py-2.5 gap-2">
+                    <span class="material-symbols-outlined text-sm">delete_sweep</span> Clear Data
+                </button>
+                <button onclick="handleLogout()" class="btn-outline text-on-surface-variant text-sm px-5 py-2.5 gap-2">
+                    <span class="material-symbols-outlined text-sm">logout</span> Sign Out
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer-container"></footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // FIX #3: Profile editing state
+        let isEditing = true; // Start in edit mode if no profile
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const profile = getProfile() || { name: '', email: '', phone: '', city: '' };
+            const savedAddress = getAddress();
+            
+            document.getElementById('profile-name').textContent = profile.name || 'Smart Shop User';
+            document.getElementById('profile-email').textContent = profile.email || 'user@smartshop.in';
+            document.getElementById('profile-avatar').textContent = (profile.name || 'U')[0].toUpperCase();
+            
+            document.getElementById('p-name').value = profile.name || '';
+            document.getElementById('p-email').value = profile.email || '';
+            document.getElementById('p-phone').value = profile.phone || '';
+            document.getElementById('p-city').value = profile.city || '';
+            document.getElementById('p-address').value = savedAddress || '';
+            
+            document.getElementById('stat-orders').textContent = getOrders().length;
+            document.getElementById('stat-wishlist').textContent = getWishlist().length;
+            document.getElementById('stat-cart').textContent = getCartCount();
+            
+            // If profile already exists, lock fields + show edit button
+            if (profile.name) {
+                lockFields();
+            }
+        });
+        
+        // FIX #3: Lock fields after save
+        function lockFields() {
+            const fields = ['p-name', 'p-email', 'p-phone', 'p-city', 'p-address'];
+            fields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.disabled = true;
+                    el.style.opacity = '0.7';
+                }
+            });
+            document.getElementById('save-btn').style.display = 'none';
+            document.getElementById('edit-btn').style.display = 'flex';
+            isEditing = false;
+        }
+        
+        // FIX #3: Enable editing
+        function enableEdit() {
+            const fields = ['p-name', 'p-email', 'p-phone', 'p-city', 'p-address'];
+            fields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.disabled = false;
+                    el.style.opacity = '1';
+                }
+            });
+            document.getElementById('save-btn').style.display = 'inline-flex';
+            document.getElementById('edit-btn').style.display = 'none';
+            document.getElementById('save-status').classList.add('hidden');
+            document.getElementById('p-name').focus();
+            isEditing = true;
+        }
+        
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const profileData = {
+                name: document.getElementById('p-name').value,
+                email: document.getElementById('p-email').value,
+                phone: document.getElementById('p-phone').value,
+                city: document.getElementById('p-city').value,
+            };
+            const addr = document.getElementById('p-address').value;
+
+            // Save to localStorage (always works)
+            saveProfile(profileData);
+            if (addr) saveAddress(addr);
+
+            // Also save to backend if API available
+            if (typeof AuthAPI !== 'undefined') {
+                try {
+                    await AuthAPI.updateProfile({
+                        name: profileData.name,
+                        phone: profileData.phone,
+                        address: {
+                            street: addr,
+                            city: profileData.city,
+                            state: '',
+                            zipCode: ''
+                        }
+                    });
+                } catch(err) {
+                    console.log('Backend save skipped:', err.message);
+                }
+            }
+            
+            // Update header
+            document.getElementById('profile-name').textContent = profileData.name || 'Smart Shop User';
+            document.getElementById('profile-email').textContent = profileData.email || 'user@smartshop.in';
+            document.getElementById('profile-avatar').textContent = (profileData.name || 'U')[0].toUpperCase();
+            
+            // Show saved status + lock fields
+            document.getElementById('save-status').classList.remove('hidden');
+            lockFields();
+            
+            showToast('Profile Saved', 'Your profile has been updated.', 'check_circle', 'green');
+            renderNavbar();
+        });
+    </script>
+</body>
+</html>

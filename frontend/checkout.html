@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Secure Checkout | Smart Shop</title>
+    <meta name="description" content="Complete your purchase securely at Smart Shop"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="./js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="bg-surface font-body text-on-surface antialiased flex flex-col min-h-screen">
+
+    <header class="fixed top-0 w-full z-50" id="navbar"></header>
+
+    <main class="pt-28 md:pt-32 pb-24 max-w-[900px] mx-auto w-full px-4 md:px-6 flex-grow animate-fade-up">
+        
+        <!-- Progress Steps -->
+        <div class="flex items-center justify-center gap-4 md:gap-6 mb-12">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold"><span class="material-symbols-outlined filled-icon text-sm">check</span></div>
+                <span class="text-sm font-bold text-green-600 hidden sm:inline">Cart</span>
+            </div>
+            <div class="w-10 md:w-16 h-0.5 bg-green-200 rounded-full"></div>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full signature-gradient text-white flex items-center justify-center text-sm font-bold">2</div>
+                <span class="text-sm font-bold text-primary hidden sm:inline">Checkout</span>
+            </div>
+            <div class="w-10 md:w-16 h-0.5 bg-surface-container-highest rounded-full"></div>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center text-sm font-bold">3</div>
+                <span class="text-sm font-bold text-on-surface-variant hidden sm:inline">Confirm</span>
+            </div>
+        </div>
+
+        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tighter text-on-surface mb-2">Checkout</h1>
+        <p class="text-on-surface-variant text-base md:text-lg mb-10">Almost there! Review your order and complete payment.</p>
+
+        <!-- Order Items Summary -->
+        <div class="bg-surface-container-lowest rounded-lg p-6 md:p-8 shadow-sm mb-8">
+            <h2 class="text-lg font-bold text-on-surface mb-6 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">shopping_bag</span> Order Items
+            </h2>
+            <div id="checkout-items" class="space-y-4">
+            </div>
+            <div class="divider"></div>
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-on-surface-variant">Order Total (incl. 18% GST)</span>
+                <span id="checkout-total" class="text-2xl font-black tracking-tighter text-on-surface"></span>
+            </div>
+        </div>
+
+        <form id="checkout-form" class="w-full space-y-8">
+            <!-- Shipping Details -->
+            <div class="bg-surface-container-lowest rounded-lg p-6 md:p-8 shadow-sm">
+                <h2 class="text-lg font-bold tracking-tight text-on-surface mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">local_shipping</span> Shipping Details
+                </h2>
+                
+                <div class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="form-label">Full Name</label>
+                            <input type="text" id="fullName" required class="form-input" placeholder="Your full name"/>
+                        </div>
+                        <div>
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" id="phone" required class="form-input" placeholder="+91 98765 43210"/>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Street Address</label>
+                        <input type="text" id="address" required class="form-input" placeholder="123, MG Road, Sector 5"/>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div>
+                            <label class="form-label">City</label>
+                            <input type="text" id="city" required class="form-input" placeholder="Mumbai"/>
+                        </div>
+                        <div>
+                            <label class="form-label">State</label>
+                            <input type="text" id="state" required class="form-input" placeholder="Maharashtra"/>
+                        </div>
+                        <div>
+                            <label class="form-label">PIN Code</label>
+                            <input type="text" id="postalCode" required class="form-input" placeholder="400001"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ══════════════════════════════════════════
+                 FIX #2: Payment Methods - Card + UPI + COD
+                 ══════════════════════════════════════════ -->
+            <div class="bg-surface-container-lowest rounded-lg p-6 md:p-8 shadow-sm relative overflow-hidden">
+                <h2 class="text-lg font-bold tracking-tight text-on-surface mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">payments</span> Payment Method
+                </h2>
+                
+                <!-- Payment Method Selection -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+                    <label class="payment-option cursor-pointer" onclick="document.getElementById('radio-card').checked=true; switchPayment('card')">
+                        <input type="radio" id="radio-card" name="payment" value="card" class="opacity-0 absolute w-0 h-0" checked onchange="switchPayment('card')"/>
+                        <div id="pay-card" class="flex items-center gap-3 p-4 rounded-lg border-2 border-primary bg-primary-fixed/20 transition-all">
+                            <span class="material-symbols-outlined text-primary">credit_card</span>
+                            <div>
+                                <p class="font-bold text-sm text-on-surface">Card</p>
+                                <p class="text-xs text-on-surface-variant">Debit / Credit</p>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="payment-option cursor-pointer" onclick="document.getElementById('radio-upi').checked=true; switchPayment('upi')">
+                        <input type="radio" id="radio-upi" name="payment" value="upi" class="opacity-0 absolute w-0 h-0" onchange="switchPayment('upi')"/>
+                        <div id="pay-upi" class="flex items-center gap-3 p-4 rounded-lg border-2 border-outline-variant/20 hover:border-primary/40 transition-all">
+                            <span class="material-symbols-outlined text-on-surface-variant">account_balance</span>
+                            <div>
+                                <p class="font-bold text-sm text-on-surface">UPI</p>
+                                <p class="text-xs text-on-surface-variant">GPay / PhonePe</p>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="payment-option cursor-pointer" onclick="document.getElementById('radio-cod').checked=true; switchPayment('cod')">
+                        <input type="radio" id="radio-cod" name="payment" value="cod" class="opacity-0 absolute w-0 h-0" onchange="switchPayment('cod')"/>
+                        <div id="pay-cod" class="flex items-center gap-3 p-4 rounded-lg border-2 border-outline-variant/20 hover:border-primary/40 transition-all">
+                            <span class="material-symbols-outlined text-on-surface-variant">payments</span>
+                            <div>
+                                <p class="font-bold text-sm text-on-surface">Cash</p>
+                                <p class="text-xs text-on-surface-variant">Pay on Delivery</p>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                
+                <!-- Card Details (default visible) -->
+                <div id="payment-card-form" class="space-y-5 relative z-10">
+                    <div class="absolute right-0 top-0 overflow-hidden opacity-5 pointer-events-none">
+                        <span class="material-symbols-outlined" style="font-size: 150px;">credit_card</span>
+                    </div>
+                    <div>
+                        <label class="form-label">Card Number</label>
+                        <input type="text" id="card-number" placeholder="XXXX XXXX XXXX XXXX" class="form-input font-mono"/>
+                    </div>
+                    <div class="grid grid-cols-2 gap-5">
+                        <div>
+                            <label class="form-label">Expiry Date</label>
+                            <input type="text" id="card-expiry" placeholder="MM/YY" class="form-input font-mono"/>
+                        </div>
+                        <div>
+                            <label class="form-label">CVV</label>
+                            <input type="password" id="card-cvv" placeholder="***" class="form-input font-mono"/>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- UPI Details (hidden initially) -->
+                <div id="payment-upi-form" class="space-y-5" style="display: none;">
+                    <div class="flex items-center gap-3 p-4 bg-surface-container-low rounded-md">
+                        <span class="material-symbols-outlined text-primary text-2xl">qr_code_scanner</span>
+                        <div>
+                            <p class="font-bold text-sm text-on-surface">Pay via UPI</p>
+                            <p class="text-xs text-on-surface-variant">Enter your UPI ID or scan QR code</p>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">UPI ID</label>
+                        <input type="text" id="upi-id" placeholder="yourname@upi" class="form-input"/>
+                    </div>
+                </div>
+                
+                <!-- COD Details (hidden initially) -->
+                <div id="payment-cod-form" class="space-y-4" style="display: none;">
+                    <div class="flex items-start gap-4 p-5 bg-surface-container-low rounded-md">
+                        <span class="material-symbols-outlined text-primary text-2xl mt-0.5">info</span>
+                        <div>
+                            <p class="font-bold text-sm text-on-surface mb-1">Cash on Delivery</p>
+                            <p class="text-sm text-on-surface-variant leading-relaxed">Pay when your order arrives. Please keep exact change ready. A small COD fee of ₹40 may apply.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 mt-2">
+                        <input type="checkbox" id="cod-agree" checked/>
+                        <label for="cod-agree" class="text-sm text-on-surface-variant">I agree to pay on delivery</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" id="checkout-btn" class="w-full py-5 md:py-6 rounded-full signature-gradient text-on-primary font-bold text-lg md:text-xl shadow-lg shadow-primary/20 hover:scale-[1.01] active:scale-[0.98] transition-all text-center flex items-center justify-center gap-3 border-none cursor-pointer">
+                <span class="material-symbols-outlined">lock</span> <span id="checkout-btn-text">Confirm & Pay</span>
+            </button>
+            <p class="text-center text-sm font-medium text-on-surface-variant">Payments are secure and encrypted. (Demo mode)</p>
+        </form>
+    </main>
+
+    <footer id="footer-container"></footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // FIX #2: Payment method switching
+        function switchPayment(method) {
+            // Hide all
+            document.getElementById('payment-card-form').style.display = 'none';
+            document.getElementById('payment-upi-form').style.display = 'none';
+            document.getElementById('payment-cod-form').style.display = 'none';
+            
+            // Reset all option styles
+            ['pay-card', 'pay-upi', 'pay-cod'].forEach(id => {
+                document.getElementById(id).className = 'flex items-center gap-3 p-4 rounded-lg border-2 border-outline-variant/20 hover:border-primary/40 transition-all';
+                document.getElementById(id).querySelector('.material-symbols-outlined').className = 'material-symbols-outlined text-on-surface-variant';
+            });
+            
+            // Show selected
+            const activeId = 'pay-' + method;
+            document.getElementById(activeId).className = 'flex items-center gap-3 p-4 rounded-lg border-2 border-primary bg-primary-fixed/20 transition-all';
+            document.getElementById(activeId).querySelector('.material-symbols-outlined').className = 'material-symbols-outlined text-primary';
+            
+            if (method === 'card') {
+                document.getElementById('payment-card-form').style.display = 'block';
+                document.getElementById('checkout-btn-text').textContent = 'Confirm & Pay';
+            } else if (method === 'upi') {
+                document.getElementById('payment-upi-form').style.display = 'block';
+                document.getElementById('checkout-btn-text').textContent = 'Pay with UPI';
+            } else if (method === 'cod') {
+                document.getElementById('payment-cod-form').style.display = 'block';
+                document.getElementById('checkout-btn-text').textContent = 'Place Order (COD)';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const profile = getProfile();
+            if (!profile) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const cart = getCart();
+            if (cart.length === 0) {
+                window.location.href = 'cart.html';
+                return;
+            }
+            
+            const itemsContainer = document.getElementById('checkout-items');
+            const totalLabel = document.getElementById('checkout-total');
+            let total = 0;
+            
+            cart.forEach(item => {
+                const product = getProductById(item.productId);
+                if (!product) return;
+                const amount = product.price * item.quantity;
+                total += amount;
+                
+                itemsContainer.innerHTML += `
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-surface-container-low rounded-md overflow-hidden p-2 flex-shrink-0">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-contain" style="mix-blend-mode: multiply;" onerror="this.src='https://via.placeholder.com/60'"/>
+                        </div>
+                        <div class="flex-grow min-w-0">
+                            <h4 class="font-bold text-sm text-on-surface truncate">${product.name}</h4>
+                            <span class="text-xs text-on-surface-variant">Qty: ${item.quantity}</span>
+                        </div>
+                        <span class="font-bold text-on-surface flex-shrink-0">${formatPrice(amount)}</span>
+                    </div>
+                `;
+            });
+            
+            const tax = Math.round(total * 0.18);
+            totalLabel.textContent = formatPrice(total + tax);
+            
+            // Auto-fill from profile
+            const profile = getProfile();
+            if (profile) {
+                if (profile.name) document.getElementById('fullName').value = profile.name;
+                if (profile.phone) document.getElementById('phone').value = profile.phone;
+            }
+            
+            // Auto-fill saved address
+            const savedAddr = getAddress();
+            if (savedAddr) {
+                document.getElementById('address').value = savedAddr;
+            }
+        });
+        
+        document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            
+            // ✅ Payment Validation
+            if (paymentMethod === 'upi') {
+                const upi = document.getElementById('upi-id').value;
+                if (!upi || !upi.includes('@')) {
+                    if (typeof showToast === 'function') showToast('Invalid Details', 'Please enter a valid UPI ID (e.g. name@upi)', 'error', 'red');
+                    else alert('Enter valid UPI ID');
+                    return;
+                }
+            } else if (paymentMethod === 'card') {
+                const cardNum = document.getElementById('card-number').value;
+                const expiry = document.getElementById('card-expiry').value;
+                const cvv = document.getElementById('card-cvv').value;
+                if (!cardNum || !expiry || !cvv) {
+                    if (typeof showToast === 'function') showToast('Invalid Details', 'Please fill all credit card details.', 'error', 'red');
+                    else alert('Fill all card details');
+                    return;
+                }
+            }
+            
+            const btn = document.getElementById('checkout-btn');
+            const originalBtnHTML = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin-slow text-2xl">sync</span> Processing...';
+            btn.disabled = true;
+            
+            const shippingInfo = {
+                fullName: document.getElementById('fullName').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+                postalCode: document.getElementById('postalCode').value,
+                paymentMethod: paymentMethod
+            };
+            
+            // Save address for future use
+            saveAddress(shippingInfo.address);
+            
+            if (!getProfile()) {
+                saveProfile({ name: shippingInfo.fullName, email: 'user@smartshop.in', phone: shippingInfo.phone });
+            }
+            
+            // Try backend order creation
+            try {
+                const cart = getCart();
+                let itemsPrice = 0;
+                const orderItems = cart.map(item => {
+                    const product = getProductById(item.productId);
+                    if (!product) return null;
+                    itemsPrice += product.price * item.quantity;
+                    return {
+                        name: product.name,
+                        qty: item.quantity,
+                        image: product.image,
+                        price: product.price,
+                        product: item.productId
+                    };
+                }).filter(Boolean);
+
+                const taxPrice = Math.round(itemsPrice * 0.18);
+                const shippingPrice = itemsPrice > 500 ? 0 : 99;
+                const totalPrice = itemsPrice + taxPrice + shippingPrice;
+
+                // Try backend API
+                if (typeof OrdersAPI !== 'undefined') {
+                    const backendOrder = await OrdersAPI.create({
+                        orderItems,
+                        shippingAddress: {
+                            firstName: shippingInfo.fullName.split(' ')[0],
+                            lastName: shippingInfo.fullName.split(' ').slice(1).join(' ') || '',
+                            street: shippingInfo.address,
+                            city: shippingInfo.city,
+                            state: shippingInfo.state,
+                            zipCode: shippingInfo.postalCode
+                        },
+                        paymentMethod,
+                        itemsPrice,
+                        taxPrice,
+                        shippingPrice,
+                        totalPrice
+                    });
+
+                    if (backendOrder) {
+                        // Clear backend cart too
+                        if (typeof CartAPI !== 'undefined') await CartAPI.clear();
+                    }
+                }
+            } catch(err) {
+                console.log('Backend order skipped:', err.message);
+            }
+
+            // Always create local order too (for offline display)
+            setTimeout(() => {
+                const order = createOrder(shippingInfo);
+                if (order) {
+                    window.location.href = 'order-success.html?id=' + order.id;
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

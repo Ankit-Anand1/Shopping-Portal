@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Product Details | Smart Shop</title>
+    <meta name="description" content="View product details on Smart Shop"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="./js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="bg-surface font-body text-on-surface antialiased flex flex-col min-h-screen">
+
+    <header class="fixed top-0 w-full z-50" id="navbar"></header>
+
+    <main class="pt-24 pb-12 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto w-full flex-grow animate-fade-up">
+        
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 mb-8 text-xs uppercase tracking-widest text-on-surface-variant font-medium">
+            <a href="index.html" class="opacity-60 hover:text-primary transition-colors">Home</a>
+            <span class="mx-1 opacity-30">/</span>
+            <a href="shop.html" class="opacity-60 hover:text-primary transition-colors">Shop</a>
+            <span class="mx-1 opacity-30">/</span>
+            <span id="breadcrumb-cat" class="opacity-60 hover:text-primary transition-colors cursor-pointer"></span>
+            <span class="mx-1 opacity-30">/</span>
+            <span id="breadcrumb-name" class="text-on-surface font-bold truncate max-w-[200px]"></span>
+        </nav>
+
+        <div id="product-container">
+            <!-- Loading state -->
+            <div class="flex flex-col items-center justify-center py-20">
+                <span class="material-symbols-outlined animate-spin-slow text-4xl text-primary mb-4">sync</span>
+                <p class="text-on-surface-variant">Loading product...</p>
+            </div>
+        </div>
+
+        <!-- Reviews & Specs Section -->
+        <div id="reviews-section" class="mt-16 md:mt-24">
+        </div>
+
+        <!-- Related Products -->
+        <div class="mt-16 md:mt-24">
+            <div class="flex justify-between items-end mb-8 md:mb-12">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">You May Also Like</h2>
+                    <p class="text-on-surface-variant">Complete your collection</p>
+                </div>
+            </div>
+            <div id="related-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5">
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer-container"></footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        let currentProduct = null;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            
+            if (!productId) { window.location.href = 'shop.html'; return; }
+            
+            // ══════════════════════════════════════════
+            // FIX #1: Smart product lookup
+            // 1. Try local PRODUCTS array
+            // 2. Try API cache in localStorage
+            // 3. Try cached selected product
+            // 4. Fallback: redirect to shop
+            // ══════════════════════════════════════════
+            let product = getProductById(productId);
+            
+            // If not found, try the cached selected product
+            if (!product) {
+                try {
+                    const cached = JSON.parse(localStorage.getItem('smartshop_selected_product'));
+                    if (cached && cached.id === productId) {
+                        product = cached;
+                    }
+                } catch(e) {}
+            }
+            
+            if (!product) { 
+                showToast('Product Not Found', 'Redirecting to shop...', 'error', 'red');
+                setTimeout(() => { window.location.href = 'shop.html'; }, 1000); 
+                return; 
+            }
+            
+            currentProduct = product;
+            document.title = `${product.name} | Smart Shop`;
+            
+            // Breadcrumb
+            document.getElementById('breadcrumb-cat').textContent = product.category;
+            document.getElementById('breadcrumb-cat').onclick = () => window.location.href = `shop.html?category=${product.category}`;
+            document.getElementById('breadcrumb-name').textContent = product.name;
+            
+            const discount = product.originalPrice > product.price ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
+            const wished = isInWishlist(product.id);
+            
+            // Safely handle missing specs/reviews for API products
+            const specs = product.specs && product.specs.length > 0 ? product.specs : ['Premium Quality', 'Brand Authentic', 'Fast Delivery', 'Easy Returns'];
+            const reviews = product.reviews && product.reviews.length > 0 ? product.reviews : [];
+            
+            const container = document.getElementById('product-container');
+            container.innerHTML = `
+                <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-start">
+                    <!-- Left: Gallery -->
+                    <div class="flex flex-col gap-4">
+                        <div class="aspect-square bg-surface-container-low rounded-lg overflow-hidden group relative">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-contain p-8 transition-transform duration-700 group-hover:scale-105" style="mix-blend-mode: multiply;" onerror="this.src='https://via.placeholder.com/400x400?text=Product'"/>
+                            ${discount > 0 ? `<span class="discount-badge absolute top-4 left-4 text-sm px-4 py-1.5">${discount}% OFF</span>` : ''}
+                            <button onclick="toggleWishlist('${product.id}'); updatePdpWish();" id="pdp-wish-btn" data-product-id="${product.id}" class="wishlist-btn absolute top-4 right-4 w-12 h-12 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center shadow-lg z-10 ${wished ? 'active' : ''}">
+                                <span class="material-symbols-outlined" style="font-size:24px;">favorite</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Details -->
+                    <div class="flex flex-col space-y-6">
+                        <div>
+                            <span class="text-primary font-bold tracking-widest text-[10px] uppercase mb-3 block">${product.brand} · Premium</span>
+                            <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-on-surface leading-tight mb-3">${product.name}</h1>
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="flex text-secondary-container">
+                                    ${generateStars(product.rating)}
+                                </div>
+                                <span class="text-on-surface-variant text-sm font-medium">${product.rating} (${product.numReviews.toLocaleString('en-IN')} Reviews)</span>
+                            </div>
+                            <div class="flex items-baseline gap-3 mb-1">
+                                <span class="text-3xl font-black text-primary">${formatPrice(product.price)}</span>
+                                ${discount > 0 ? `
+                                    <span class="original-price text-lg">${formatPrice(product.originalPrice)}</span>
+                                    <span class="discount-badge text-sm px-3 py-1">${discount}% OFF</span>
+                                ` : ''}
+                            </div>
+                            <p class="text-xs text-on-surface-variant font-medium">Inclusive of all taxes</p>
+                        </div>
+
+                        <p class="text-on-surface-variant text-base md:text-lg leading-relaxed max-w-md">${product.description || 'Premium quality product with authentic brand guarantee and fast delivery.'}</p>
+
+                        <!-- Specs -->
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-widest mb-3 text-on-surface-variant">Key Features</h3>
+                            <div class="flex flex-wrap gap-2">
+                                ${specs.map(s => `<span class="badge badge-primary">${s}</span>`).join('')}
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex flex-col gap-3">
+                                <label class="text-xs font-bold tracking-widest text-on-surface-variant uppercase">Quantity</label>
+                                <div class="flex items-center bg-surface-container-high rounded-full w-fit px-2 py-1">
+                                    <button onclick="changeQty(-1)" class="qty-btn">
+                                        <span class="material-symbols-outlined text-xl">remove</span>
+                                    </button>
+                                    <span id="pdp-qty" class="w-12 text-center font-bold">1</span>
+                                    <button onclick="changeQty(1)" class="qty-btn">
+                                        <span class="material-symbols-outlined text-xl">add</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                                <button onclick="addToCart('${product.id}', parseInt(document.getElementById('pdp-qty').textContent))" class="signature-gradient text-on-primary px-10 py-4 rounded-full font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex-1 flex items-center justify-center gap-2 border-none cursor-pointer">
+                                    <span class="material-symbols-outlined">shopping_cart</span> Add to Cart
+                                </button>
+                                <button onclick="addToCart('${product.id}', parseInt(document.getElementById('pdp-qty').textContent)); window.location.href='checkout.html'" class="bg-surface-container-high text-on-surface px-10 py-4 rounded-full font-bold hover:bg-surface-container-highest transition-all flex-1 flex items-center justify-center gap-2 border border-outline-variant/15 cursor-pointer">
+                                    <span class="material-symbols-outlined">bolt</span> Buy Now
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="pt-6 grid grid-cols-2 gap-4 border-t border-outline-variant/15">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">local_shipping</span>
+                                <span class="text-sm font-medium">Free Express Shipping</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">verified_user</span>
+                                <span class="text-sm font-medium">1 Year Warranty</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">replay</span>
+                                <span class="text-sm font-medium">7-Day Returns</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">shield</span>
+                                <span class="text-sm font-medium">100% Authentic</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            `;
+            
+            // ══════════════════════════════════════════
+            // FIX #5 + #6: Reviews & Specs tabs with
+            // working tab switching + user review form
+            // ══════════════════════════════════════════
+            const userReviews = getProductReviews(product.id);
+            const allReviews = [...userReviews, ...reviews]; // user reviews first
+            
+            const reviewsSection = document.getElementById('reviews-section');
+            reviewsSection.innerHTML = `
+                <!-- Tab Buttons -->
+                <div class="flex gap-0 border-b border-outline-variant/20 mb-8 md:mb-12">
+                    <button id="tab-btn-reviews" onclick="showTab('reviews')" class="pb-4 px-6 border-b-2 border-primary text-primary font-bold text-base md:text-lg transition-all">Reviews (${allReviews.length})</button>
+                    <button id="tab-btn-specs" onclick="showTab('specs')" class="pb-4 px-6 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-medium text-base md:text-lg transition-all">Specifications</button>
+                </div>
+                
+                <!-- Reviews Tab -->
+                <div id="tab-reviews">
+                    <div class="grid md:grid-cols-2 gap-12 md:gap-16">
+                        <div>
+                            <!-- Rating Summary -->
+                            <div class="flex items-center gap-6 mb-8">
+                                <div class="text-center">
+                                    <span class="text-5xl font-black text-on-surface block mb-1">${product.rating}</span>
+                                    <div class="flex mb-2">${generateStars(product.rating)}</div>
+                                    <span class="text-sm text-on-surface-variant font-medium">${product.numReviews.toLocaleString('en-IN')} reviews</span>
+                                </div>
+                                <div class="flex-grow">
+                                    ${[5,4,3,2,1].map(star => {
+                                        const count = allReviews.filter(r => Math.floor(r.rating) === star).length;
+                                        const pct = allReviews.length > 0 ? (count / allReviews.length * 100) : (star >= 4 ? 60 : star === 3 ? 25 : 10);
+                                        return `
+                                            <div class="flex items-center gap-3 mb-2">
+                                                <span class="text-sm font-bold text-on-surface-variant w-6">${star}★</span>
+                                                <div class="flex-grow h-2 bg-surface-container-highest rounded-full overflow-hidden">
+                                                    <div class="h-full rounded-full bg-primary" style="width: ${pct}%"></div>
+                                                </div>
+                                                <span class="text-xs font-bold text-on-surface-variant w-6 text-right">${count}</span>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- FIX #6: Write a Review Form -->
+                            <div class="bg-surface-container-low rounded-lg p-6 mb-8">
+                                <h3 class="text-base font-bold text-on-surface mb-4 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-green-600">rate_review</span> Write a Review
+                                </h3>
+                                <form id="review-form" class="space-y-4" onsubmit="submitReview(event)">
+                                    <div>
+                                        <label class="form-label">Your Name</label>
+                                        <input type="text" id="review-name" required class="form-input" placeholder="John Doe"/>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Your Rating</label>
+                                        <input type="hidden" id="review-rating" value="5"/>
+                                        <div id="star-selector" class="flex items-center gap-1 mt-1">
+                                            <span class="star-pick material-symbols-outlined cursor-pointer" data-val="1" onclick="setStarRating(1)" style="font-size:32px; color:#f59e0b; font-variation-settings: 'FILL' 1;">star</span>
+                                            <span class="star-pick material-symbols-outlined cursor-pointer" data-val="2" onclick="setStarRating(2)" style="font-size:32px; color:#f59e0b; font-variation-settings: 'FILL' 1;">star</span>
+                                            <span class="star-pick material-symbols-outlined cursor-pointer" data-val="3" onclick="setStarRating(3)" style="font-size:32px; color:#f59e0b; font-variation-settings: 'FILL' 1;">star</span>
+                                            <span class="star-pick material-symbols-outlined cursor-pointer" data-val="4" onclick="setStarRating(4)" style="font-size:32px; color:#f59e0b; font-variation-settings: 'FILL' 1;">star</span>
+                                            <span class="star-pick material-symbols-outlined cursor-pointer" data-val="5" onclick="setStarRating(5)" style="font-size:32px; color:#f59e0b; font-variation-settings: 'FILL' 1;">star</span>
+                                            <span id="star-label" class="ml-3 text-sm font-bold text-on-surface-variant">5 — Excellent</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Your Review</label>
+                                        <textarea id="review-text" required class="form-input" rows="3" placeholder="Share your experience with this product..."></textarea>
+                                    </div>
+                                    <button type="submit" class="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 rounded-full text-white font-bold text-sm border-none cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md" style="background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); box-shadow: 0 8px 20px rgba(22,163,74,0.25);">
+                                        <span class="material-symbols-outlined text-sm">send</span> Submit Review
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- Existing Reviews -->
+                            <div id="reviews-list" class="space-y-6">
+                                ${allReviews.length > 0 ? allReviews.map(review => renderReviewCard(review)).join('') : `
+                                    <div class="text-center py-8">
+                                        <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-3 block">forum</span>
+                                        <p class="text-on-surface-variant font-medium">No reviews yet. Be the first to share your experience!</p>
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                        
+                        <!-- Specs Panel (always visible in Reviews tab for context) -->
+                        <div class="bg-surface-container-low rounded-lg p-8 h-fit">
+                            <h3 class="text-lg font-bold mb-6">Quick Specs</h3>
+                            <div class="space-y-4">
+                                ${specs.map(s => `
+                                    <div class="flex items-start gap-3">
+                                        <span class="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
+                                        <span class="text-sm text-on-surface-variant">${s}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FIX #5: Specifications Tab (hidden by default) -->
+                <div id="tab-specs" style="display: none;">
+                    <div class="max-w-3xl">
+                        <div class="bg-surface-container-lowest rounded-lg overflow-hidden shadow-sm">
+                            <table class="w-full">
+                                <tbody>
+                                    <tr class="border-b border-outline-variant/10">
+                                        <td class="px-6 py-4 font-bold text-sm text-on-surface bg-surface-container-low w-1/3">Brand</td>
+                                        <td class="px-6 py-4 text-sm text-on-surface-variant">${product.brand}</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant/10">
+                                        <td class="px-6 py-4 font-bold text-sm text-on-surface bg-surface-container-low">Category</td>
+                                        <td class="px-6 py-4 text-sm text-on-surface-variant">${product.category}</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant/10">
+                                        <td class="px-6 py-4 font-bold text-sm text-on-surface bg-surface-container-low">Price</td>
+                                        <td class="px-6 py-4 text-sm text-on-surface-variant">${formatPrice(product.price)}</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant/10">
+                                        <td class="px-6 py-4 font-bold text-sm text-on-surface bg-surface-container-low">Rating</td>
+                                        <td class="px-6 py-4 text-sm text-on-surface-variant">${product.rating} / 5.0 (${product.numReviews.toLocaleString('en-IN')} ratings)</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant/10">
+                                        <td class="px-6 py-4 font-bold text-sm text-on-surface bg-surface-container-low">Availability</td>
+                                        <td class="px-6 py-4 text-sm"><span class="badge badge-success">In Stock</span></td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant/10">
+                                        <td class="px-6 py-4 font-bold text-sm text-on-surface bg-surface-container-low">Warranty</td>
+                                        <td class="px-6 py-4 text-sm text-on-surface-variant">1 Year Manufacturer Warranty</td>
+                                    </tr>
+                                    <tr class="border-b border-outline-variant/10">
+                                        <td class="px-6 py-4 font-bold text-sm text-on-surface bg-surface-container-low">Return Policy</td>
+                                        <td class="px-6 py-4 text-sm text-on-surface-variant">7-Day Easy Returns</td>
+                                    </tr>
+                                    ${specs.map(s => `
+                                        <tr class="border-b border-outline-variant/10">
+                                            <td class="px-6 py-4 font-bold text-sm text-on-surface bg-surface-container-low">Feature</td>
+                                            <td class="px-6 py-4 text-sm text-on-surface-variant">${s}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Related Products
+            const relatedGrid = document.getElementById('related-grid');
+            const allProds = [...PRODUCTS, ...getApiProducts()];
+            const related = allProds.filter(p => p.category === product.category && p.id !== product.id).slice(0, 5);
+            related.forEach((p, idx) => {
+                const wrapper = document.createElement('div');
+                wrapper.style.opacity = '0';
+                wrapper.style.animation = `fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 60}ms forwards`;
+                wrapper.innerHTML = generateProductCard(p);
+                relatedGrid.appendChild(wrapper);
+            });
+            
+            updateWishlistButtons();
+            
+            // Pre-fill review name from profile if logged in
+            const profile = getProfile();
+            if (profile && profile.name) {
+                const nameInput = document.getElementById('review-name');
+                if (nameInput) nameInput.value = profile.name;
+            }
+        });
+        
+        // ══════════════════════════════════════════
+        // FIX #5: Tab switching logic
+        // ══════════════════════════════════════════
+        function showTab(tab) {
+            const reviewsTab = document.getElementById('tab-reviews');
+            const specsTab = document.getElementById('tab-specs');
+            const btnReviews = document.getElementById('tab-btn-reviews');
+            const btnSpecs = document.getElementById('tab-btn-specs');
+            
+            if (tab === 'reviews') {
+                reviewsTab.style.display = 'block';
+                specsTab.style.display = 'none';
+                btnReviews.className = 'pb-4 px-6 border-b-2 border-primary text-primary font-bold text-base md:text-lg transition-all';
+                btnSpecs.className = 'pb-4 px-6 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-medium text-base md:text-lg transition-all';
+            } else {
+                reviewsTab.style.display = 'none';
+                specsTab.style.display = 'block';
+                btnSpecs.className = 'pb-4 px-6 border-b-2 border-primary text-primary font-bold text-base md:text-lg transition-all';
+                btnReviews.className = 'pb-4 px-6 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-medium text-base md:text-lg transition-all';
+            }
+        }
+        
+        // ══════════════════════════════════════════
+        // FIX #6: Submit user review
+        // ══════════════════════════════════════════
+        function submitReview(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('review-name').value.trim();
+            const rating = parseInt(document.getElementById('review-rating').value);
+            const comment = document.getElementById('review-text').value.trim();
+            
+            if (!name || !comment) return;
+            
+            const review = {
+                user: name,
+                rating: rating,
+                comment: comment,
+                date: new Date().toISOString(),
+                isUserReview: true
+            };
+            
+            // Save to localStorage per product
+            saveProductReview(currentProduct.id, review);
+            
+            // Prepend to the review list live
+            const reviewsList = document.getElementById('reviews-list');
+            const noReviews = reviewsList.querySelector('.text-center');
+            if (noReviews) noReviews.remove();
+            
+            reviewsList.insertAdjacentHTML('afterbegin', renderReviewCard(review));
+            
+            // Update tab count
+            const allUserReviews = getProductReviews(currentProduct.id);
+            const existingReviews = (currentProduct.reviews && currentProduct.reviews.length) || 0;
+            const btnReviews = document.getElementById('tab-btn-reviews');
+            if (btnReviews) {
+                btnReviews.textContent = `Reviews (${allUserReviews.length + existingReviews})`;
+            }
+            
+            
+            // Clear form + reset stars
+            document.getElementById('review-text').value = '';
+            document.getElementById('review-rating').value = '5';
+            setStarRating(5);
+            
+            showToast('Review Submitted!', 'Thank you for your feedback.', 'thumb_up', 'green');
+        }
+        
+        // ══════════════════════════════════════════
+        // Interactive star rating selector
+        // ══════════════════════════════════════════
+        function setStarRating(val) {
+            document.getElementById('review-rating').value = val;
+            const stars = document.querySelectorAll('.star-pick');
+            const labels = {1: '1 — Poor', 2: '2 — Fair', 3: '3 — Good', 4: '4 — Very Good', 5: '5 — Excellent'};
+            stars.forEach(star => {
+                const starVal = parseInt(star.getAttribute('data-val'));
+                if (starVal <= val) {
+                    star.style.color = '#f59e0b';
+                    star.style.fontVariationSettings = "'FILL' 1";
+                    star.textContent = 'star';
+                } else {
+                    star.style.color = '#d1d5db';
+                    star.style.fontVariationSettings = "'FILL' 0";
+                    star.textContent = 'star';
+                }
+            });
+            const label = document.getElementById('star-label');
+            if (label) label.textContent = labels[val] || val + ' stars';
+        }
+        
+        // Render a single review card
+        function renderReviewCard(review) {
+            const userName = review.user || 'Anonymous';
+            const initial = userName[0].toUpperCase();
+            const dateStr = review.date ? new Date(review.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recently';
+            
+            return `
+                <div class="animate-fade-up ${review.isUserReview ? 'border-l-2 border-primary pl-4' : ''}">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full ${review.isUserReview ? 'bg-primary' : 'signature-gradient'} flex items-center justify-center text-white text-sm font-bold">${initial}</div>
+                            <div>
+                                <h4 class="font-bold text-sm text-on-surface flex items-center gap-2">${userName}
+                                    ${review.isUserReview ? '<span class="text-[10px] font-bold text-primary bg-primary-fixed px-2 py-0.5 rounded-full">YOU</span>' : ''}
+                                </h4>
+                                <span class="text-xs text-on-surface-variant">${dateStr}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1 bg-surface-container-low px-2.5 py-1 rounded-full">
+                            <span class="text-xs font-bold text-on-surface">${review.rating}</span>
+                            <span class="material-symbols-outlined star-filled" style="font-size:14px; font-variation-settings: 'FILL' 1;">star</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-on-surface-variant leading-relaxed ml-[52px]">${review.comment}</p>
+                </div>
+            `;
+        }
+        
+        let qty = 1;
+        function changeQty(delta) {
+            qty = Math.max(1, qty + delta);
+            document.getElementById('pdp-qty').textContent = qty;
+        }
+        
+        function updatePdpWish() {
+            const btn = document.getElementById('pdp-wish-btn');
+            if (btn && currentProduct) {
+                btn.classList.toggle('active', isInWishlist(currentProduct.id));
+            }
+        }
+    </script>
+</body>
+</html>

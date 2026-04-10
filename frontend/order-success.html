@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Order Confirmed! | Smart Shop</title>
+    <meta name="description" content="Your Smart Shop order has been confirmed"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="./js/tailwind-config.js"></script>
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+        @keyframes confettiFall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            animation: confettiFall 3s ease-in-out forwards;
+            z-index: 100;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased flex flex-col min-h-screen">
+
+    <header class="fixed top-0 w-full z-50" id="navbar"></header>
+
+    <main class="pt-28 md:pt-32 pb-24 max-w-[800px] mx-auto w-full px-4 md:px-6 flex-grow animate-fade-up flex flex-col items-center">
+        
+        <!-- Progress Steps -->
+        <div class="flex items-center justify-center gap-4 md:gap-6 mb-14 w-full">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-sm"><span class="material-symbols-outlined filled-icon text-sm">check</span></div>
+                <span class="text-sm font-bold text-green-600 hidden sm:inline">Cart</span>
+            </div>
+            <div class="w-10 md:w-16 h-0.5 bg-green-200 rounded-full"></div>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-sm"><span class="material-symbols-outlined filled-icon text-sm">check</span></div>
+                <span class="text-sm font-bold text-green-600 hidden sm:inline">Checkout</span>
+            </div>
+            <div class="w-10 md:w-16 h-0.5 bg-green-200 rounded-full"></div>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-sm"><span class="material-symbols-outlined filled-icon text-sm">check</span></div>
+                <span class="text-sm font-bold text-green-600 hidden sm:inline">Confirmed</span>
+            </div>
+        </div>
+
+        <!-- Success Card -->
+        <div class="bg-surface-container-lowest rounded-lg p-8 md:p-12 lg:p-16 shadow-sm w-full text-center">
+            
+            <!-- Animated Checkmark -->
+            <div class="flex justify-center mb-8">
+                <div class="success-circle animate-float">
+                    <span class="material-symbols-outlined">check</span>
+                </div>
+            </div>
+            
+            <h1 class="text-3xl md:text-5xl font-extrabold tracking-tighter text-on-surface mb-4">
+                Order Confirmed! 🎉
+            </h1>
+            
+            <p class="text-lg text-on-surface-variant font-medium mb-3">Thank you for your purchase!</p>
+            
+            <div id="order-id-display" class="inline-flex items-center gap-2 bg-primary-fixed px-4 py-2 rounded-full mb-8">
+                <span class="material-symbols-outlined text-primary text-sm">receipt</span>
+                <span class="text-sm font-bold text-primary" id="order-id-text">ORD-XXXXXX</span>
+            </div>
+            
+            <!-- Delivery Info -->
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200/30 rounded-md p-6 md:p-8 mb-8 text-left">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-green-600 filled-icon" style="font-size:28px; font-variation-settings: 'FILL' 1;">local_shipping</span>
+                    <h3 class="text-lg font-bold text-green-800">Estimated Delivery</h3>
+                </div>
+                <p id="delivery-date" class="text-2xl md:text-3xl font-extrabold text-green-700 mb-2"></p>
+                <p class="text-sm text-green-600 font-medium">Your order will be delivered to your doorstep</p>
+            </div>
+            
+            <!-- Order Items -->
+            <div id="success-items" class="text-left mb-8 space-y-3">
+            </div>
+            
+            <!-- Total -->
+            <div class="flex justify-between items-center bg-surface-container-low rounded-md px-6 py-4 mb-10">
+                <span class="text-lg font-bold text-on-surface-variant">Total Paid</span>
+                <span id="success-total" class="text-2xl font-black tracking-tighter text-on-surface"></span>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="orders.html" class="btn-primary px-8 py-4 gap-2">
+                    <span class="material-symbols-outlined">local_shipping</span> Track Order
+                </a>
+                <a href="shop.html" class="btn-outline text-on-surface-variant font-bold px-8 py-4 gap-2">
+                    <span class="material-symbols-outlined">shopping_bag</span> Continue Shopping
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer-container"></footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Confetti effect
+        function launchConfetti() {
+            const colors = ['#4f46e5', '#9e41f5', '#ec4899', '#16a34a', '#f59e0b', '#3b82f6', '#ef4444'];
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+                confetti.style.width = (6 + Math.random() * 8) + 'px';
+                confetti.style.height = (6 + Math.random() * 8) + 'px';
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 5000);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('id');
+            
+            const orders = getOrders();
+            const order = orders.find(o => o.id === orderId);
+            
+            if (!order) {
+                document.getElementById('order-id-text').textContent = 'Order not found';
+                return;
+            }
+            
+            document.getElementById('order-id-text').textContent = order.id;
+            
+            const deliveryDate = new Date(order.deliveryDate);
+            document.getElementById('delivery-date').textContent = deliveryDate.toLocaleDateString('en-IN', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            
+            const itemsContainer = document.getElementById('success-items');
+            order.items.forEach(item => {
+                itemsContainer.innerHTML += `
+                    <div class="flex items-center gap-4 bg-surface-container-low rounded-md p-4">
+                        <div class="w-14 h-14 bg-surface-container-lowest rounded-md overflow-hidden p-2 flex-shrink-0">
+                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-contain" style="mix-blend-mode: multiply;"/>
+                        </div>
+                        <div class="flex-grow min-w-0">
+                            <h4 class="font-bold text-sm text-on-surface truncate">${item.name}</h4>
+                            <span class="text-xs text-on-surface-variant">Qty: ${item.quantity} × ${formatPrice(item.price)}</span>
+                        </div>
+                        <span class="font-bold text-on-surface flex-shrink-0">${formatPrice(item.price * item.quantity)}</span>
+                    </div>
+                `;
+            });
+            
+            const tax = Math.round(order.total * 0.18);
+            document.getElementById('success-total').textContent = formatPrice(order.total + tax);
+            
+            setTimeout(launchConfetti, 500);
+        });
+    </script>
+</body>
+</html>
