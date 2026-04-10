@@ -101,7 +101,7 @@
                 
                 <!-- Payment Method Selection -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-                    <label class="payment-option cursor-pointer" onclick="document.getElementById('radio-card').checked=true; switchPayment('card')">
+                    <div class="payment-option cursor-pointer" onclick="document.getElementById('radio-card').checked=true; switchPayment('card')">
                         <input type="radio" id="radio-card" name="payment" value="card" class="opacity-0 absolute w-0 h-0" checked onchange="switchPayment('card')"/>
                         <div id="pay-card" class="flex items-center gap-3 p-4 rounded-lg border-2 border-primary bg-primary-fixed/20 transition-all">
                             <span class="material-symbols-outlined text-primary">credit_card</span>
@@ -110,8 +110,8 @@
                                 <p class="text-xs text-on-surface-variant">Debit / Credit</p>
                             </div>
                         </div>
-                    </label>
-                    <label class="payment-option cursor-pointer" onclick="document.getElementById('radio-upi').checked=true; switchPayment('upi')">
+                    </div>
+                    <div class="payment-option cursor-pointer" onclick="document.getElementById('radio-upi').checked=true; switchPayment('upi')">
                         <input type="radio" id="radio-upi" name="payment" value="upi" class="opacity-0 absolute w-0 h-0" onchange="switchPayment('upi')"/>
                         <div id="pay-upi" class="flex items-center gap-3 p-4 rounded-lg border-2 border-outline-variant/20 hover:border-primary/40 transition-all">
                             <span class="material-symbols-outlined text-on-surface-variant">account_balance</span>
@@ -120,8 +120,8 @@
                                 <p class="text-xs text-on-surface-variant">GPay / PhonePe</p>
                             </div>
                         </div>
-                    </label>
-                    <label class="payment-option cursor-pointer" onclick="document.getElementById('radio-cod').checked=true; switchPayment('cod')">
+                    </div>
+                    <div class="payment-option cursor-pointer" onclick="document.getElementById('radio-cod').checked=true; switchPayment('cod')">
                         <input type="radio" id="radio-cod" name="payment" value="cod" class="opacity-0 absolute w-0 h-0" onchange="switchPayment('cod')"/>
                         <div id="pay-cod" class="flex items-center gap-3 p-4 rounded-lg border-2 border-outline-variant/20 hover:border-primary/40 transition-all">
                             <span class="material-symbols-outlined text-on-surface-variant">payments</span>
@@ -130,7 +130,7 @@
                                 <p class="text-xs text-on-surface-variant">Pay on Delivery</p>
                             </div>
                         </div>
-                    </label>
+                    </div>
                 </div>
                 
                 <!-- Card Details (default visible) -->
@@ -269,7 +269,6 @@
             totalLabel.textContent = formatPrice(total + tax);
             
             // Auto-fill from profile
-            const profile = getProfile();
             if (profile) {
                 if (profile.name) document.getElementById('fullName').value = profile.name;
                 if (profile.phone) document.getElementById('phone').value = profile.phone;
