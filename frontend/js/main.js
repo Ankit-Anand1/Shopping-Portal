@@ -715,11 +715,12 @@ function renderBottomNav() {
     nav.id = 'bottom-nav';
     nav.className = 'md:hidden';
     nav.innerHTML = `
-        <div class="fixed bottom-4 left-4 right-4 z-[200] bg-white/90 backdrop-blur-2xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-[2rem] flex justify-between items-center px-4 py-3">
+        <div class="fixed bottom-6 left-4 right-4 z-[200] bg-white/90 backdrop-blur-3xl border border-white/80 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15)] rounded-full flex justify-between items-center p-2">
             ${navItems.map(item => `
-                <a href="${item.href}" class="relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 ${item.active ? 'bg-primary/10 scale-105' : 'hover:bg-slate-100'}">
-                    <span class="material-symbols-outlined transition-all duration-300" style="font-size: ${item.active ? '26px' : '24px'}; color: ${item.active ? '#3525cd' : '#94a3b8'}; ${item.active ? "font-variation-settings: 'FILL' 1;" : ''}">${item.icon}</span>
-                    ${item.badge > 0 ? `<span class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-pink-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-white transform translate-x-1 -translate-y-1">${item.badge}</span>` : ''}
+                <a href="${item.href}" class="relative flex items-center justify-center gap-2 h-12 transition-all duration-300 ease-out rounded-full ${item.active ? 'bg-slate-900 px-5 shadow-md shadow-slate-900/20' : 'w-12 hover:bg-slate-100/80'}">
+                    <span class="material-symbols-outlined flex-shrink-0" style="font-size: ${item.active ? '20px' : '24px'}; color: ${item.active ? '#ffffff' : '#64748b'}; ${item.active ? "font-variation-settings: 'FILL' 1;" : ''}">${item.icon}</span>
+                    ${item.active ? `<span class="font-extrabold text-[13px] tracking-wide text-white whitespace-nowrap animate-fade-in">${item.label}</span>` : ''}
+                    ${item.badge > 0 ? `<span class="absolute top-1.5 right-1.5 w-[18px] h-[18px] rounded-full bg-pink-500 text-white text-[9px] font-bold flex items-center justify-center border-2 transform translate-x-1 -translate-y-1 ${item.active ? 'border-slate-900' : 'border-white'}">${item.badge}</span>` : ''}
                 </a>
             `).join('')}
         </div>
