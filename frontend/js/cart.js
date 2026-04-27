@@ -22,13 +22,15 @@ function loadCart() {
     
     if (cart.length === 0) {
         container.innerHTML = `
-            <div class="empty-state bg-surface-container-lowest rounded-lg">
-                <div class="empty-state-icon">
-                    <span class="material-symbols-outlined text-[40px] text-on-surface-variant">shopping_bag</span>
+            <div class="bg-white rounded-[2rem] p-12 md:p-20 shadow-sm border border-slate-200/60 flex flex-col items-center justify-center text-center">
+                <div class="w-24 h-24 rounded-[1.5rem] bg-indigo-50 flex items-center justify-center mb-6 shadow-inner border border-indigo-100">
+                    <span class="material-symbols-outlined text-indigo-400" style="font-size: 48px;">shopping_bag</span>
                 </div>
-                <h3 class="text-2xl font-black text-on-surface mb-2">Your cart is empty</h3>
-                <p class="text-on-surface-variant font-medium mb-8">Looks like you haven't added anything to your cart yet.</p>
-                <a href="shop.html" class="btn-primary">Start Shopping</a>
+                <h3 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-3 font-heading tracking-tight">Your cart is empty</h3>
+                <p class="text-slate-500 font-medium mb-8 max-w-md">Looks like you haven't added anything to your cart yet. Discover something beautiful!</p>
+                <a href="shop.html" class="px-8 py-4 bg-indigo-600 text-white rounded-full font-bold shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 hover:-translate-y-1 transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">explore</span> Start Shopping
+                </a>
             </div>
         `;
         if (subtotalLabel) subtotalLabel.textContent = formatPrice(0);
@@ -47,31 +49,33 @@ function loadCart() {
         total += amount;
         
         container.innerHTML += `
-        <div class="group relative flex flex-col md:flex-row gap-4 md:gap-8 p-4 md:p-6 bg-surface-container-lowest rounded-lg transition-all duration-500 hover:shadow-ambient hover:scale-[1.01] mb-4">
-            <div class="w-full md:w-40 h-40 rounded-md overflow-hidden bg-surface-container-low cursor-pointer flex-shrink-0" onclick="window.location.href='product.html?id=${product.id}'">
-                <img class="w-full h-full object-contain p-3" src="${product.image}" alt="${product.name}" style="mix-blend-mode: multiply;"/>
+        <div class="group relative flex flex-col md:flex-row gap-5 md:gap-8 p-4 md:p-5 bg-white border border-slate-200/60 rounded-[2rem] transition-all duration-300 hover:shadow-xl hover:border-indigo-100 mb-4 items-center">
+            <div class="w-full md:w-36 h-36 rounded-[1.5rem] overflow-hidden bg-slate-50 cursor-pointer flex-shrink-0 border border-slate-100/50 flex items-center justify-center" onclick="window.location.href='product.html?id=${product.id}'">
+                <img class="w-[80%] h-[80%] object-contain transition-transform duration-500 group-hover:scale-110 mix-blend-multiply" src="${product.image}" alt="${product.name}"/>
             </div>
-            <div class="flex-1 flex flex-col justify-between">
-                <div class="flex justify-between items-start">
+            
+            <div class="flex-1 w-full flex flex-col justify-between py-2">
+                <div class="flex justify-between items-start gap-4">
                     <div>
-                        <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1 block">${product.brand}</span>
-                        <h3 class="text-lg md:text-2xl font-bold tracking-tight text-on-surface cursor-pointer hover:text-primary transition-colors" onclick="window.location.href='product.html?id=${product.id}'">${product.name}</h3>
+                        <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-[0.2em] mb-1.5 block bg-indigo-50 w-fit px-2 py-0.5 rounded-md border border-indigo-100/50">${product.brand}</span>
+                        <h3 class="text-lg md:text-xl font-extrabold tracking-tight text-slate-800 cursor-pointer hover:text-indigo-600 transition-colors font-heading leading-tight" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${product.name}</h3>
                     </div>
-                    <button onclick="removeFromCart('${product.id}'); loadCart();" class="text-on-surface-variant hover:text-error transition-colors p-2 rounded-full hover:bg-error-container/30">
-                        <span class="material-symbols-outlined">delete</span>
+                    <button onclick="removeFromCart('${product.id}'); loadCart();" class="text-slate-300 hover:text-red-500 transition-all p-2 rounded-full hover:bg-red-50 flex-shrink-0 group/del">
+                        <span class="material-symbols-outlined group-hover/del:scale-110 transition-transform">delete</span>
                     </button>
                 </div>
-                <div class="flex flex-wrap items-center justify-between mt-4 gap-4">
-                    <div class="flex items-center bg-surface-container-high rounded-full p-1 border border-outline-variant/15">
-                        <button onclick="updateCartQty('${product.id}', ${item.quantity - 1}); loadCart();" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-lowest transition-all">
-                            <span class="material-symbols-outlined text-sm">remove</span>
+                
+                <div class="flex flex-wrap items-end justify-between mt-6 gap-4">
+                    <div class="flex items-center bg-slate-50 rounded-[1rem] p-1 border border-slate-200 shadow-sm">
+                        <button onclick="updateCartQty('${product.id}', ${item.quantity - 1}); loadCart();" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:text-slate-900 transition-all hover:shadow-sm">
+                            <span class="material-symbols-outlined text-[16px]">remove</span>
                         </button>
-                        <span class="px-4 md:px-6 font-semibold text-on-surface">${item.quantity}</span>
-                        <button onclick="updateCartQty('${product.id}', ${item.quantity + 1}); loadCart();" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-lowest transition-all">
-                            <span class="material-symbols-outlined text-sm">add</span>
+                        <span class="w-10 text-center font-extrabold text-slate-900">${item.quantity}</span>
+                        <button onclick="updateCartQty('${product.id}', ${item.quantity + 1}); loadCart();" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:text-slate-900 transition-all hover:shadow-sm">
+                            <span class="material-symbols-outlined text-[16px]">add</span>
                         </button>
                     </div>
-                    <div class="text-xl md:text-2xl font-bold tracking-tighter text-on-surface">
+                    <div class="text-2xl font-black tracking-tighter text-slate-900 font-heading">
                         ${formatPrice(amount)}
                     </div>
                 </div>

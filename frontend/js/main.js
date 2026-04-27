@@ -90,7 +90,7 @@ function addToCart(productId, quantity = 1) {
     updateCartCount();
     showToast('Added to Cart', 'Your item has been added to the bag.', 'check_circle', 'green');
     // Sync with backend if available
-    if (typeof CartAPI !== 'undefined') { CartAPI.add(productId, quantity).catch(() => {}); }
+    if (typeof CartAPI !== 'undefined') { CartAPI.add(productId, quantity).catch(() => { }); }
 }
 
 function removeFromCart(productId) {
@@ -98,7 +98,7 @@ function removeFromCart(productId) {
     cart = cart.filter(item => item.productId !== productId);
     saveCart(cart);
     updateCartCount();
-    if (typeof CartAPI !== 'undefined') { CartAPI.remove(productId).catch(() => {}); }
+    if (typeof CartAPI !== 'undefined') { CartAPI.remove(productId).catch(() => { }); }
 }
 
 function updateCartQty(productId, quantity) {
@@ -159,7 +159,7 @@ function updateWishlistButtons() {
 function createOrder(shippingInfo) {
     const cart = getCart();
     if (cart.length === 0) return null;
-    
+
     const items = cart.map(item => {
         const product = getProductById(item.productId);
         return {
@@ -171,12 +171,12 @@ function createOrder(shippingInfo) {
             quantity: item.quantity
         };
     });
-    
+
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
+
     const deliveryDate = new Date();
     deliveryDate.setDate(deliveryDate.getDate() + Math.floor(Math.random() * 3) + 5);
-    
+
     const order = {
         id: 'ORD-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 5).toUpperCase(),
         items,
@@ -193,23 +193,23 @@ function createOrder(shippingInfo) {
             { status: 'Delivered', date: null, completed: false }
         ]
     };
-    
+
     const orders = getOrders();
     orders.unshift(order);
     saveOrders(orders);
-    
+
     simulateOrderProgress(order.id);
-    
+
     saveCart([]);
     updateCartCount();
-    
+
     return order;
 }
 
 function simulateOrderProgress(orderId) {
     const delays = [10000, 25000, 45000, 70000];
     const statuses = ['Packed', 'Shipped', 'Out for Delivery', 'Delivered'];
-    
+
     delays.forEach((delay, idx) => {
         setTimeout(() => {
             const orders = getOrders();
@@ -236,7 +236,7 @@ function updateCartCount() {
 
 function showToast(title, message, icon = 'check_circle', color = 'green') {
     document.querySelectorAll('.toast').forEach(t => t.remove());
-    
+
     const colorMap = {
         green: { bg: '#dcfce7', text: '#16a34a', border: '#bbf7d0' },
         pink: { bg: '#fce7f3', text: '#db2777', border: '#fbcfe8' },
@@ -244,9 +244,9 @@ function showToast(title, message, icon = 'check_circle', color = 'green') {
         red: { bg: '#fce4e4', text: '#ef4444', border: '#fecaca' },
         slate: { bg: '#f2f4f6', text: '#464555', border: '#e0e3e5' }
     };
-    
+
     const c = colorMap[color] || colorMap.green;
-    
+
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.innerHTML = `
@@ -261,7 +261,7 @@ function showToast(title, message, icon = 'check_circle', color = 'green') {
         </div>
     `;
     document.body.appendChild(toast);
-    
+
     setTimeout(() => toast.classList.add('hiding'), 2500);
     setTimeout(() => toast.remove(), 3000);
 }
@@ -297,40 +297,46 @@ function openProduct(productId) {
     window.location.href = 'product.html?id=' + encodeURIComponent(productId);
 }
 
-// ── Product Card Generator (Premium Design) ──
+// ── Product Card Generator (Premium SaaS Design) ──
 function generateProductCard(p) {
     const discount = p.originalPrice > p.price ? Math.round((1 - p.price / p.originalPrice) * 100) : 0;
     const wished = isInWishlist(p.id);
-    
+
     return `
-    <div class="product-card p-0 flex flex-col cursor-pointer relative group" onclick="openProduct('${p.id}')">
-        <div class="w-full aspect-square mb-0 relative overflow-hidden bg-surface-container-low rounded-t-[1rem]">
-            <img src="${p.image}" alt="${p.name}" class="product-img h-full w-full object-contain p-4" loading="lazy" onerror="this.src='https://via.placeholder.com/300x300?text=Product'"/>
+    <div class="group bg-white rounded-[2rem] p-4 cursor-pointer border border-slate-200/60 hover:border-indigo-500/30 flex flex-col relative overflow-hidden transition-all duration-[0.4s] hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(79,70,229,0.15)]" onclick="openProduct('${p.id}')">
+        <!-- Image Container -->
+        <div class="w-full aspect-square relative overflow-hidden bg-slate-50 rounded-[1.5rem] mb-4 flex items-center justify-center border border-slate-100/50">
+            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"></div>
+            <img src="${p.image}" alt="${p.name}" class="product-img h-[80%] w-[80%] object-contain mix-blend-multiply transition-transform duration-[1.5s] group-hover:scale-110 relative z-10" loading="lazy" onerror="this.src='https://via.placeholder.com/300x300?text=Product'"/>
             
-            ${discount > 0 ? `<span class="discount-badge absolute top-3 left-3">${discount}% off</span>` : ''}
+            ${discount > 0 ? `<span class="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-md text-rose-500 text-[10px] font-extrabold uppercase tracking-widest rounded-full shadow-sm z-20 border border-slate-100">-${discount}%</span>` : ''}
             
-            <button onclick="event.stopPropagation(); toggleWishlist('${p.id}')" data-product-id="${p.id}" class="wishlist-btn absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center shadow-sm z-10 opacity-0 group-hover:opacity-100 transition-opacity ${wished ? 'active !opacity-100' : ''}">
-                <span class="material-symbols-outlined" style="font-size: 18px;">favorite</span>
-            </button>
-            
-            <!-- Floating Add to Cart -->
-            <button onclick="event.stopPropagation(); addToCart('${p.id}', 1)" class="card-add-btn absolute bottom-3 right-3 w-10 h-10 rounded-full text-white flex items-center justify-center shadow-lg z-10 transition-all active:scale-90 signature-gradient">
-                <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
+            <button onclick="event.stopPropagation(); toggleWishlist('${p.id}')" data-product-id="${p.id}" class="absolute top-3 right-3 w-9 h-9 rounded-full bg-white text-slate-300 hover:text-pink-500 flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.05)] z-20 transition-all hover:scale-110 ${wished ? '!text-pink-500' : ''}">
+                <span class="material-symbols-outlined text-[18px]" style="${wished ? "font-variation-settings: 'FILL' 1;" : ''}">favorite</span>
             </button>
         </div>
         
-        <div class="p-4 flex flex-col flex-grow">
-            <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.15em] mb-1">${p.brand}</span>
-            <h4 class="text-sm font-semibold text-on-surface leading-snug mb-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.name}</h4>
-            
-            <div class="flex items-center gap-1.5 mb-2">
-                <span class="text-[11px] font-bold text-white px-2 py-0.5 rounded-full flex items-center gap-0.5" style="background:#16a34a;">${p.rating} <span class="material-symbols-outlined" style="font-size:12px; font-variation-settings: 'FILL' 1; color:#fff;">star</span></span>
-                <span class="text-[11px] text-on-surface-variant">(${p.numReviews.toLocaleString('en-IN')})</span>
+        <!-- Details -->
+        <div class="flex flex-col flex-grow px-2 pb-2">
+            <div class="flex justify-between items-start mb-2">
+                <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100/50">${p.brand}</span>
+                <div class="flex items-center gap-1 bg-slate-50 px-1.5 py-0.5 rounded-md border border-slate-100">
+                    <span class="material-symbols-outlined text-yellow-400 text-[12px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                    <span class="text-[10px] font-bold text-slate-700">${p.rating}</span>
+                </div>
             </div>
             
-            <div class="mt-auto flex items-baseline gap-2 flex-wrap">
-                <span class="price-tag text-lg text-on-surface">${formatPrice(p.price)}</span>
-                ${discount > 0 ? `<span class="original-price text-xs">${formatPrice(p.originalPrice)}</span>` : ''}
+            <h4 class="text-[14px] font-extrabold text-slate-800 leading-snug mb-3 font-heading group-hover:text-indigo-600 transition-colors" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.name}</h4>
+            
+            <div class="mt-auto flex items-end justify-between">
+                <div class="flex flex-col">
+                    ${discount > 0 ? `<span class="text-[11px] text-slate-400 line-through font-semibold">${formatPrice(p.originalPrice)}</span>` : ''}
+                    <span class="text-lg font-black text-slate-900 font-heading tracking-tight leading-none">${formatPrice(p.price)}</span>
+                </div>
+                
+                <button onclick="event.stopPropagation(); addToCart('${p.id}', 1)" class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/20 group-hover:bg-indigo-600 group-hover:shadow-indigo-600/30 transition-all hover:-translate-y-1 z-20">
+                    <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+                </button>
             </div>
         </div>
     </div>
@@ -365,10 +371,10 @@ function renderNavbar() {
     const profileContent = profile ? `
         <div class="relative group cursor-pointer">
             <div class="flex items-center gap-2 p-1.5 md:p-2 rounded-full hover:bg-slate-100/50 transition-all">
-                ${profile.photoURL 
-                    ? `<img src="${profile.photoURL}" alt="Profile" class="w-7 h-7 md:w-8 md:h-8 rounded-full object-cover shadow-md border border-white"/>` 
-                    : `<div class="w-7 h-7 md:w-8 md:h-8 rounded-full signature-gradient text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md border border-white">${(profile.name || 'U')[0].toUpperCase()}</div>`
-                }
+                ${profile.photoURL
+            ? `<img src="${profile.photoURL}" alt="Profile" class="w-7 h-7 md:w-8 md:h-8 rounded-full object-cover shadow-md border border-white"/>`
+            : `<div class="w-7 h-7 md:w-8 md:h-8 rounded-full signature-gradient text-white flex items-center justify-center text-[10px] md:text-xs font-bold shadow-md border border-white">${(profile.name || 'U')[0].toUpperCase()}</div>`
+        }
             </div>
             
             <div class="profile-dropdown absolute right-0 top-full mt-2 w-56 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
@@ -393,58 +399,65 @@ function renderNavbar() {
     `;
 
     navbar.innerHTML = `
-        <div class="bg-white/90 backdrop-blur-xl shadow-sm w-full">
-            <nav class="flex items-center justify-between px-3 md:px-8 py-2 max-w-full">
-                <!-- Logo + Address -->
-                <div class="flex items-center gap-3 md:gap-6">
-                    <a class="flex items-center gap-1.5 md:gap-2 whitespace-nowrap" href="index.html">
-                        <div class="w-7 h-7 md:w-8 md:h-8 rounded-md signature-gradient flex items-center justify-center flex-shrink-0">
-                            <span class="material-symbols-outlined text-white text-[16px] md:text-lg" style="font-variation-settings: 'FILL' 1;">storefront</span>
+        <div class="max-w-7xl mx-auto px-4 pt-4 md:pt-6 pb-2 transition-all duration-300" id="nav-container">
+            <div class="bg-white/80 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-200/60 rounded-[2rem] w-full py-2.5 px-4 md:px-6 flex items-center justify-between relative">
+                <!-- Logo & Categories -->
+                <div class="flex items-center gap-4 md:gap-8">
+                    <a class="flex items-center gap-2.5 whitespace-nowrap group" href="index.html">
+                        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-md group-hover:shadow-lg transition-all group-hover:scale-105">
+                            <span class="material-symbols-outlined text-white text-[20px]" style="font-variation-settings: 'FILL' 1;">storefront</span>
                         </div>
-                        <span class="text-[15px] sm:text-xl font-extrabold tracking-tighter text-slate-900">Smart Shop</span>
+                        <span class="text-[18px] sm:text-xl font-black tracking-tight text-slate-900 font-heading">Smart Shop</span>
                     </a>
-                    ${addressHTML}
-                    <div class="hidden lg:flex items-center gap-5 ml-4">
-                        <a href="shop.html?category=Mobiles" class="text-slate-500 hover:text-slate-900 text-sm font-medium transition-all duration-300">Electronics</a>
-                        <a href="shop.html?category=Clothes" class="text-slate-500 hover:text-slate-900 text-sm font-medium transition-all duration-300">Fashion</a>
-                        <a href="shop.html?category=Grocery" class="text-slate-500 hover:text-slate-900 text-sm font-medium transition-all duration-300">Grocery</a>
-                        <a href="shop.html" class="text-slate-500 hover:text-slate-900 text-sm font-medium transition-all duration-300">All</a>
+                    <div class="hidden lg:flex items-center gap-1 bg-slate-100/70 rounded-full p-1 border border-slate-200/50">
+                        <a href="shop.html?category=Mobiles" class="px-4 py-1.5 rounded-full text-slate-600 hover:text-slate-900 hover:bg-white hover:shadow-sm text-sm font-semibold transition-all duration-300">Electronics</a>
+                        <a href="shop.html?category=Clothes" class="px-4 py-1.5 rounded-full text-slate-600 hover:text-slate-900 hover:bg-white hover:shadow-sm text-sm font-semibold transition-all duration-300">Fashion</a>
+                        <a href="shop.html?category=Grocery" class="px-4 py-1.5 rounded-full text-slate-600 hover:text-slate-900 hover:bg-white hover:shadow-sm text-sm font-semibold transition-all duration-300">Grocery</a>
+                        <a href="shop.html" class="px-4 py-1.5 rounded-full text-slate-600 hover:text-slate-900 hover:bg-white hover:shadow-sm text-sm font-semibold transition-all duration-300">All</a>
                     </div>
                 </div>
 
-                <!-- Search + Actions -->
+                <!-- Search & Actions -->
                 <div class="flex items-center gap-2 md:gap-3">
+                    ${addressHTML}
+                    
                     <!-- Search Bar Desktop -->
-                    <form action="shop.html" method="GET" class="hidden lg:flex relative items-center">
-                        <input type="text" name="search" value="${currentSearch}" placeholder="Search products..." class="bg-surface-container-highest border-none rounded-full py-2 pl-10 pr-4 text-sm w-56 xl:w-64 focus:ring-2 focus:ring-primary/40 transition-all outline-none"/>
-                        <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[18px]">search</span>
+                    <form action="shop.html" method="GET" class="hidden lg:flex relative items-center group ml-2">
+                        <input type="text" name="search" value="${currentSearch}" placeholder="Search..." class="bg-slate-100/80 border border-slate-200/50 rounded-full py-2 pl-10 pr-4 text-sm w-48 xl:w-64 focus:w-72 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all duration-300 outline-none shadow-inner"/>
+                        <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[18px] group-focus-within:text-indigo-500 transition-colors">search</span>
                         <input type="hidden" name="category" value="${currentCat}"/>
                     </form>
 
-                    <div class="flex items-center gap-0">
-                        <a href="cart.html" class="relative p-1.5 md:p-2 rounded-full hover:bg-slate-100/50 transition-all">
-                            <span class="material-symbols-outlined text-slate-600 text-[20px] md:text-[24px]">shopping_cart</span>
-                            <span id="nav-cart-count" class="absolute top-0 right-0 md:-top-0.5 md:-right-0.5 w-4 h-4 md:w-5 md:h-5 rounded-full bg-primary text-white text-[9px] md:text-[10px] font-bold flex items-center justify-center transform translate-x-1 -translate-y-1" style="${getCartCount() > 0 ? '' : 'display:none'}">${getCartCount()}</span>
+                    <div class="flex items-center gap-1">
+                        <!-- Mobile Search Icon -->
+                        <button onclick="document.getElementById('mobile-search-bar').classList.toggle('hidden'); setTimeout(() => document.getElementById('mobile-search-input').focus(), 50);" class="lg:hidden p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-all flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[22px]">search</span>
+                        </button>
+                        
+                        <a href="cart.html" class="relative p-2 rounded-full hover:bg-slate-100 text-slate-600 hover:text-indigo-600 transition-all">
+                            <span class="material-symbols-outlined text-[22px]">shopping_bag</span>
+                            <span id="nav-cart-count" class="absolute top-0 right-0 w-4 h-4 rounded-full bg-indigo-600 text-white text-[10px] font-bold flex items-center justify-center transform translate-x-1 -translate-y-1 shadow-sm" style="${getCartCount() > 0 ? '' : 'display:none'}">${getCartCount()}</span>
                         </a>
-                        <a href="wishlist.html" class="p-1.5 md:p-2 rounded-full hover:bg-slate-100/50 transition-all hidden md:flex relative">
-                            <span class="material-symbols-outlined text-slate-600">favorite</span>
-                            ${getWishlist().length > 0 ? `<span class="absolute top-0 right-0 w-4 h-4 rounded-full bg-pink-500 text-white text-[9px] font-bold flex items-center justify-center transform translate-x-1 -translate-y-1">${getWishlist().length}</span>` : ''}
+                        <a href="wishlist.html" class="p-2 rounded-full hover:bg-slate-100 text-slate-600 hover:text-pink-500 transition-all hidden md:flex relative">
+                            <span class="material-symbols-outlined text-[22px]">favorite</span>
+                            ${getWishlist().length > 0 ? `<span class="absolute top-0 right-0 w-4 h-4 rounded-full bg-pink-500 text-white text-[10px] font-bold flex items-center justify-center transform translate-x-1 -translate-y-1 shadow-sm">${getWishlist().length}</span>` : ''}
                         </a>
+                        <div class="w-px h-6 bg-slate-200 mx-1 hidden md:block"></div>
                         ${profileContent}
                     </div>
                 </div>
-            </nav>
-            
-            <!-- Mobile Search -->
-            <div class="lg:hidden px-3 pb-2.5">
-                <form action="shop.html" method="GET" class="flex items-center relative">
-                    <input type="text" name="search" value="${currentSearch}" placeholder="Search products..." class="w-full bg-surface-container-highest border-none rounded-md py-1.5 pl-9 pr-3 text-[13px] focus:ring-2 focus:ring-primary/40 transition-all outline-none"/>
-                    <span class="material-symbols-outlined absolute left-2.5 text-on-surface-variant text-[16px]">search</span>
-                </form>
+                
+                <!-- Mobile Search Dropdown -->
+                <div id="mobile-search-bar" class="hidden absolute top-[calc(100%+0.5rem)] left-0 right-0 p-2 bg-white/95 backdrop-blur-2xl rounded-[1.5rem] shadow-xl border border-slate-200/60 z-50 lg:hidden">
+                    <form action="shop.html" method="GET" class="flex items-center relative">
+                        <input id="mobile-search-input" type="text" name="search" value="${currentSearch}" placeholder="Search products..." class="w-full bg-slate-100/80 border border-slate-200/50 rounded-full py-3 pl-12 pr-4 text-[14px] focus:ring-2 focus:ring-indigo-500/30 focus:bg-white transition-all outline-none"/>
+                        <span class="material-symbols-outlined absolute left-4 text-slate-400 text-[20px]">search</span>
+                    </form>
+                </div>
             </div>
         </div>
     `;
-    
+
     renderBottomNav();
 }
 
@@ -495,7 +508,7 @@ function fallbackAddressPrompt(current) {
     }
 }
 
-window.showWelcomeAnimation = function(name) {
+window.showWelcomeAnimation = function (name) {
     const overlay = document.createElement('div');
     overlay.className = 'fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white/90 backdrop-blur-xl transition-opacity duration-500';
     overlay.innerHTML = `
@@ -505,7 +518,7 @@ window.showWelcomeAnimation = function(name) {
         <h2 class="text-3xl font-black text-slate-800 opacity-0 animate-[fadeUp_0.5s_ease_0.3s_forwards]">Welcome back</h2>
         <p class="text-slate-500 mt-2 font-medium opacity-0 animate-[fadeUp_0.5s_ease_0.4s_forwards]">${name}!</p>
     `;
-    
+
     if (!document.getElementById('welcome-animations')) {
         const style = document.createElement('style');
         style.id = 'welcome-animations';
@@ -518,7 +531,7 @@ window.showWelcomeAnimation = function(name) {
         `;
         document.head.appendChild(style);
     }
-    
+
     document.body.appendChild(overlay);
 };
 
@@ -526,7 +539,7 @@ window.showWelcomeAnimation = function(name) {
 function renderFooter() {
     const footer = document.getElementById('footer-container');
     if (!footer) return;
-    
+
     footer.className = "bg-slate-50 w-full py-12 px-8 mt-12 mb-20 md:mb-0 rounded-t-[2.5rem] md:rounded-none shadow-[0_-10px_40px_rgb(0,0,0,0.02)]";
     footer.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto text-sm leading-relaxed">
@@ -589,18 +602,18 @@ function initSearchSuggestions() {
         const wrapper = input.closest('form');
         if (!wrapper) return;
         wrapper.style.position = 'relative';
-        
+
         const dropdown = document.createElement('div');
         dropdown.className = 'search-suggestions';
         dropdown.style.cssText = 'display:none; position:absolute; top:100%; left:0; right:0; background:white; border-radius:0 0 1rem 1rem; box-shadow:0 12px 40px rgba(25,28,30,0.12); z-index:200; max-height:350px; overflow-y:auto; margin-top:4px;';
         wrapper.appendChild(dropdown);
-        
+
         let debounce;
         input.addEventListener('input', (e) => {
             clearTimeout(debounce);
             const query = e.target.value.trim().toLowerCase();
             if (query.length < 2) { dropdown.style.display = 'none'; return; }
-            
+
             debounce = setTimeout(() => {
                 // Search both local + API products
                 const allSearchable = [...PRODUCTS, ...getApiProducts()];
@@ -608,16 +621,16 @@ function initSearchSuggestions() {
                 const results = allSearchable.filter(p => {
                     if (seen.has(p.id)) return false;
                     seen.add(p.id);
-                    return p.name.toLowerCase().includes(query) || 
-                           p.brand.toLowerCase().includes(query) ||
-                           p.category.toLowerCase().includes(query);
+                    return p.name.toLowerCase().includes(query) ||
+                        p.brand.toLowerCase().includes(query) ||
+                        p.category.toLowerCase().includes(query);
                 }).slice(0, 8);
-                
+
                 if (results.length === 0) {
                     dropdown.style.display = 'none';
                     return;
                 }
-                
+
                 dropdown.innerHTML = results.map(p => `
                     <a href="javascript:void(0)" onclick="openProduct('${p.id}')" class="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low transition-colors cursor-pointer" style="text-decoration:none; color:inherit;">
                         <img src="${p.image}" alt="${p.name}" class="w-10 h-10 rounded-[0.5rem] object-contain bg-surface-container-low flex-shrink-0 p-1" onerror="this.src='https://via.placeholder.com/40'"/>
@@ -631,7 +644,7 @@ function initSearchSuggestions() {
                 dropdown.style.display = 'block';
             }, 200);
         });
-        
+
         input.addEventListener('blur', () => {
             setTimeout(() => { dropdown.style.display = 'none'; }, 200);
         });
@@ -646,17 +659,17 @@ function initSearchSuggestions() {
 // ── Mobile Bottom Navigation Bar ──
 function renderBottomNav() {
     if (document.getElementById('bottom-nav')) return;
-    
+
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    
+
     const navItems = [
         { icon: 'home', label: 'Home', href: 'index.html', active: currentPage === 'index.html' || currentPage === '' },
         { icon: 'grid_view', label: 'Shop', href: 'shop.html', active: currentPage === 'shop.html' || currentPage === 'category.html' },
-        { icon: 'shopping_cart', label: 'Cart', href: 'cart.html', active: currentPage === 'cart.html', badge: getCartCount() },
+        { icon: 'shopping_bag', label: 'Cart', href: 'cart.html', active: currentPage === 'cart.html', badge: getCartCount() },
         { icon: 'favorite', label: 'Wishlist', href: 'wishlist.html', active: currentPage === 'wishlist.html', badge: getWishlist().length },
         { icon: 'person', label: 'Account', href: 'profile.html', active: currentPage === 'profile.html' || currentPage === 'login.html' || currentPage === 'orders.html' }
     ];
-    
+
     const nav = document.createElement('div');
     nav.id = 'bottom-nav';
     nav.className = 'md:hidden';
@@ -680,3 +693,4 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartCount();
     initSearchSuggestions();
 });
+

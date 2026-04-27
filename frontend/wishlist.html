@@ -19,25 +19,27 @@
         
         <div class="flex items-end justify-between mb-10 md:mb-14">
             <div>
-                <h1 class="text-3xl md:text-5xl font-extrabold tracking-tighter text-on-surface mb-2 flex items-center gap-3">
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-2 flex items-center gap-3 font-heading">
                     My Wishlist
-                    <span class="material-symbols-outlined text-pink-500 filled-icon" style="font-size:36px; font-variation-settings: 'FILL' 1;">favorite</span>
+                    <span class="material-symbols-outlined text-pink-500 filled-icon drop-shadow-sm" style="font-size:36px; font-variation-settings: 'FILL' 1;">favorite</span>
                 </h1>
-                <p id="wishlist-count" class="text-on-surface-variant text-base md:text-lg">0 items saved</p>
+                <p id="wishlist-count" class="text-slate-500 text-lg font-medium">0 items saved</p>
             </div>
         </div>
 
-        <div id="wishlist-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5">
+        <div id="wishlist-container" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         </div>
         
         <div id="wishlist-empty" class="hidden">
-            <div class="empty-state bg-surface-container-lowest rounded-lg">
-                <div class="empty-state-icon" style="background: rgba(236, 72, 153, 0.08);">
-                    <span class="material-symbols-outlined text-[40px] text-pink-300">favorite</span>
+            <div class="bg-white rounded-[2.5rem] p-12 md:p-20 shadow-sm border border-slate-200/60 flex flex-col items-center justify-center text-center">
+                <div class="w-24 h-24 rounded-[1.5rem] bg-pink-50 flex items-center justify-center mb-6 shadow-inner border border-pink-100">
+                    <span class="material-symbols-outlined text-pink-400" style="font-size: 48px;">favorite</span>
                 </div>
-                <h3 class="text-2xl font-black text-on-surface mb-2">Your wishlist is empty</h3>
-                <p class="text-on-surface-variant font-medium mb-8">Save items you love by clicking the heart icon.</p>
-                <a href="shop.html" class="btn-primary">Explore Products</a>
+                <h3 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-3 font-heading tracking-tight">Your wishlist is empty</h3>
+                <p class="text-slate-500 font-medium mb-8 max-w-md">Save items you love by clicking the heart icon on any product card to curate your own collection.</p>
+                <a href="shop.html" class="px-8 py-4 bg-indigo-600 text-white rounded-full font-bold shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 hover:-translate-y-1 transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">explore</span> Explore Products
+                </a>
             </div>
         </div>
     </main>

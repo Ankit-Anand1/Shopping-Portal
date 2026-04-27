@@ -1,142 +1,349 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Login | Smart Shop</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script src="./js/tailwind-config.js"></script>
-    <link rel="stylesheet" href="./css/style.css">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login | Smart Shop</title>
+<meta name="description" content="Sign in to Smart Shop – your premium curated shopping destination."/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#f5f7ff;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+
+/* ── Background ── */
+.page-bg{
+  position:fixed;inset:0;z-index:0;
+  background:linear-gradient(135deg,#f0f4ff 0%,#faf5ff 50%,#f0f9ff 100%);
+}
+.bg-blob{
+  position:absolute;border-radius:50%;filter:blur(70px);opacity:0.55;
+  animation:blobFloat 10s ease-in-out infinite;
+}
+.blob1{width:500px;height:500px;background:radial-gradient(circle,#c7d2fe,transparent 70%);top:-100px;left:-100px;animation-delay:0s;}
+.blob2{width:400px;height:400px;background:radial-gradient(circle,#e9d5ff,transparent 70%);bottom:-80px;right:-80px;animation-delay:-4s;}
+.blob3{width:300px;height:300px;background:radial-gradient(circle,#bae6fd,transparent 70%);top:50%;right:20%;animation-delay:-7s;opacity:0.4;}
+@keyframes blobFloat{0%,100%{transform:translate(0,0);}50%{transform:translate(20px,-20px);}}
+
+/* ── Layout ── */
+.page-wrap{position:relative;z-index:10;display:flex;min-height:100vh;}
+
+/* ── Left Panel ── */
+.left-panel{
+  display:none;flex:1;align-items:center;justify-content:center;
+  padding:60px 48px;flex-direction:column;
+}
+@media(min-width:1024px){.left-panel{display:flex;}}
+
+.brand-logo{display:flex;align-items:center;gap:10px;margin-bottom:48px;align-self:flex-start;}
+.brand-icon{
+  width:44px;height:44px;background:linear-gradient(135deg,#4f46e5,#9e41f5);
+  border-radius:14px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 20px rgba(79,70,229,0.3);
+}
+.brand-icon .material-symbols-outlined{color:#fff;font-size:22px;font-variation-settings:'FILL' 1;}
+.brand-name{font-size:1.2rem;font-weight:800;color:#1e1b4b;letter-spacing:-0.02em;}
+
+.left-content{max-width:400px;width:100%;}
+
+.eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,rgba(79,70,229,0.1),rgba(158,65,245,0.1));
+  border:1px solid rgba(79,70,229,0.2);border-radius:100px;
+  padding:6px 14px;font-size:0.72rem;font-weight:700;
+  color:#4f46e5;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:24px;
+}
+.eyebrow .material-symbols-outlined{font-size:13px;font-variation-settings:'FILL' 1;}
+
+.panel-title{font-size:2.6rem;font-weight:900;color:#1e1b4b;letter-spacing:-0.04em;line-height:1.1;margin-bottom:16px;}
+.panel-title span{background:linear-gradient(135deg,#4f46e5,#9e41f5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.panel-desc{font-size:0.95rem;color:#64748b;line-height:1.7;margin-bottom:36px;}
+
+.feature-list{display:flex;flex-direction:column;gap:14px;}
+.feature-item{display:flex;align-items:center;gap:12px;}
+.feat-icon{
+  width:38px;height:38px;border-radius:11px;
+  background:linear-gradient(135deg,rgba(79,70,229,0.1),rgba(158,65,245,0.1));
+  border:1px solid rgba(79,70,229,0.15);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.feat-icon .material-symbols-outlined{font-size:18px;color:#4f46e5;font-variation-settings:'FILL' 1;}
+.feat-text{font-size:0.88rem;font-weight:500;color:#475569;}
+
+/* Floating stats card */
+
+/* ── Right Panel ── */
+.right-panel{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:32px 24px;
+}
+
+/* ── Card ── */
+.login-card{
+  width:100%;max-width:440px;
+  background:rgba(255,255,255,0.9);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.9);border-radius:28px;
+  padding:44px 40px;
+  box-shadow:0 4px 6px rgba(0,0,0,0.02),0 24px 60px rgba(79,70,229,0.1),0 0 0 1px rgba(79,70,229,0.04);
+  animation:cardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+
+.mobile-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;justify-content:center;}
+@media(min-width:1024px){.mobile-logo{display:none;}}
+
+.card-title{font-size:1.65rem;font-weight:800;color:#1e1b4b;letter-spacing:-0.03em;margin-bottom:6px;}
+.card-sub{font-size:0.88rem;color:#94a3b8;font-weight:400;margin-bottom:32px;}
+
+/* Error */
+.err-box{
+  display:none;align-items:center;gap:8px;
+  background:#fff1f2;border:1px solid #fecdd3;border-radius:12px;
+  padding:12px 14px;font-size:0.83rem;color:#e11d48;font-weight:500;margin-bottom:20px;
+  animation:fadeIn 0.3s ease;
+}
+.err-box.show{display:flex;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.err-box .material-symbols-outlined{font-size:16px;flex-shrink:0;}
+
+/* Floating Label Inputs */
+.field{position:relative;margin-bottom:18px;}
+.field-input{
+  width:100%;padding:20px 18px 8px;
+  background:#f8faff;border:1.5px solid #e2e8f0;border-radius:14px;
+  font-size:0.95rem;font-family:'Inter',sans-serif;font-weight:500;color:#1e1b4b;
+  outline:none;transition:all 0.25s ease;caret-color:#4f46e5;
+}
+.field-input::placeholder{color:transparent;}
+.field-input:focus{border-color:#a5b4fc;background:#fff;box-shadow:0 0 0 4px rgba(79,70,229,0.08);}
+.field-input:focus~.field-label,.field-input:not(:placeholder-shown)~.field-label{
+  top:8px;font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#4f46e5;
+}
+.field-label{
+  position:absolute;left:18px;top:50%;transform:translateY(-50%);
+  font-size:0.9rem;font-weight:500;color:#94a3b8;pointer-events:none;
+  transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.field-icon{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:#cbd5e1;
+  display:flex;align-items:center;padding:4px;transition:color 0.2s;
+}
+.field-icon:hover{color:#4f46e5;}
+.field-icon .material-symbols-outlined{font-size:19px;}
+
+
+.forgot-row{display:flex;justify-content:flex-end;margin-top:8px;margin-bottom:20px;}
+.forgot{font-size:0.78rem;font-weight:600;color:#4f46e5;transition:color 0.2s;}
+.forgot:hover{color:#7c3aed;}
+
+/* Sign in button */
+.btn-signin{
+  width:100%;padding:15px;border:none;border-radius:14px;cursor:pointer;
+  background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 50%,#9e41f5 100%);
+  color:#fff;font-size:0.97rem;font-weight:700;font-family:'Inter',sans-serif;
+  letter-spacing:0.01em;position:relative;overflow:hidden;
+  box-shadow:0 6px 20px rgba(79,70,229,0.3);transition:all 0.3s ease;
+}
+.btn-signin::after{
+  content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
+  transition:left 0.5s ease;
+}
+.btn-signin:hover::after{left:100%;}
+.btn-signin:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(79,70,229,0.38);}
+.btn-signin:active{transform:scale(0.98);}
+.btn-signin:disabled{opacity:0.65;cursor:not-allowed;transform:none;}
+
+/* OR divider */
+.divider{display:flex;align-items:center;gap:14px;margin:22px 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:#f1f5f9;}
+.divider span{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:#cbd5e1;}
+
+/* Google button */
+.btn-google{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:13px;background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;
+  color:#334155;font-size:0.9rem;font-weight:600;font-family:'Inter',sans-serif;
+  cursor:pointer;transition:all 0.3s ease;
+  box-shadow:0 1px 4px rgba(0,0,0,0.04);
+}
+.btn-google:hover{border-color:#a5b4fc;background:#f8faff;transform:translateY(-1px);box-shadow:0 6px 18px rgba(79,70,229,0.1);}
+.btn-google:active{transform:scale(0.98);}
+.btn-google:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+
+.signup-row{text-align:center;margin-top:24px;font-size:0.84rem;color:#94a3b8;}
+.signup-row a{color:#4f46e5;font-weight:600;transition:color 0.2s;}
+.signup-row a:hover{color:#7c3aed;}
+
+/* Trust */
+.trust-row{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:24px;padding-top:20px;border-top:1px solid #f1f5f9;}
+.trust-item{display:flex;align-items:center;gap:4px;font-size:0.7rem;font-weight:600;color:#cbd5e1;}
+.trust-item .material-symbols-outlined{font-size:13px;color:#a5b4fc;font-variation-settings:'FILL' 1;}
+
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.spin{animation:spin 0.8s linear infinite;display:inline-flex;}
+</style>
 </head>
-<body class="bg-surface font-body text-on-surface antialiased overflow-x-hidden">
+<body>
 
-<main class="min-h-screen flex flex-col md:flex-row">
-    <!-- Left Section: Brand -->
-    <section class="hidden md:flex md:w-1/2 relative overflow-hidden bg-surface-container-highest">
-        <div class="absolute inset-0 z-0">
-            <img alt="Shopping" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1607082349566-187342175e2f?w=1400&q=80&fit=crop"/>
-            <div class="absolute inset-0 bg-gradient-to-tr from-primary/30 to-secondary/20"></div>
+<div class="page-bg">
+  <div class="bg-blob blob1"></div>
+  <div class="bg-blob blob2"></div>
+  <div class="bg-blob blob3"></div>
+</div>
+
+<div class="page-wrap">
+  <!-- Left Panel -->
+  <div class="left-panel">
+    <a href="index.html" class="brand-logo">
+      <div class="brand-icon"><span class="material-symbols-outlined">shopping_bag</span></div>
+      <span class="brand-name">Smart Shop</span>
+    </a>
+    <div class="left-content">
+      <div class="eyebrow"><span class="material-symbols-outlined">bolt</span>Premium Commerce</div>
+      <h1 class="panel-title">Shop smarter.<br/><span>Live better.</span></h1>
+      <p class="panel-desc">Discover a curated world of premium products, delivered fast with zero compromise on quality.</p>
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feat-icon"><span class="material-symbols-outlined">verified</span></div>
+          <span class="feat-text">100% quality-verified products</span>
         </div>
-        <div class="relative z-10 p-12 flex flex-col justify-between w-full h-full">
-            <div><a href="index.html" class="text-3xl font-bold tracking-tighter text-white drop-shadow-md">Smart Shop</a></div>
-            <div class="glass-panel p-10 rounded-lg max-w-md border border-white/20">
-                <h1 class="text-4xl font-bold tracking-tight text-on-surface mb-4">Elevate your daily essentials.</h1>
-                <p class="text-on-surface-variant leading-relaxed">Join a curated community of modern shoppers focused on quality, precision, and architectural design.</p>
-            </div>
+        <div class="feature-item">
+          <div class="feat-icon"><span class="material-symbols-outlined">local_shipping</span></div>
+          <span class="feat-text">Express delivery nationwide</span>
         </div>
-    </section>
+        <div class="feature-item">
+          <div class="feat-icon"><span class="material-symbols-outlined">lock</span></div>
+          <span class="feat-text">Bank-grade secure checkout</span>
+        </div>
+        <div class="feature-item">
+          <div class="feat-icon"><span class="material-symbols-outlined">favorite</span></div>
+          <span class="feat-text">Wishlists &amp; personalised deals</span>
+        </div>
+      </div>
 
-    <!-- Right Section: Login Form -->
-    <section class="flex-1 flex flex-col items-center justify-center p-6 md:p-16 lg:p-24 bg-surface">
-        <div class="md:hidden mb-12 text-center">
-            <a href="index.html" class="text-2xl font-bold tracking-tighter text-primary">Smart Shop</a>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="right-panel">
+    <div class="login-card">
+      <!-- Mobile logo -->
+      <a href="index.html" class="mobile-logo">
+        <div class="brand-icon"><span class="material-symbols-outlined">shopping_bag</span></div>
+        <span class="brand-name">Smart Shop</span>
+      </a>
+
+      <h2 class="card-title">Welcome back 👋</h2>
+      <p class="card-sub">Sign in to your account to continue.</p>
+
+      <div id="login-error" class="err-box">
+        <span class="material-symbols-outlined">error</span>
+        <span id="err-msg"></span>
+      </div>
+
+      <form id="login-form">
+        <div class="field">
+          <input id="login-email" class="field-input" type="email" placeholder="email" required autocomplete="email"/>
+          <label class="field-label" for="login-email">Email Address</label>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <input id="login-password" class="field-input" type="password" placeholder="password" required autocomplete="current-password" style="padding-right:50px;"/>
+          <label class="field-label" for="login-password">Password</label>
+          <button type="button" class="field-icon" id="toggle-pw">
+            <span class="material-symbols-outlined" id="eye-icon">visibility</span>
+          </button>
         </div>
 
-        <div class="w-full max-w-[420px] space-y-8">
-            <div class="text-center md:text-left space-y-4">
-                <h2 class="text-3xl font-bold tracking-tight text-on-surface">Welcome back</h2>
-                <p class="text-on-surface-variant">Access your curated collection and recent orders.</p>
-            </div>
+        <div class="forgot-row"><a href="#" class="forgot">Forgot password?</a></div>
+        <button id="login-btn" type="submit" class="btn-signin">Sign In</button>
+      </form>
 
-            <div id="login-error" class="hidden p-3 rounded-lg bg-red-50 text-red-600 text-sm font-medium"></div>
+      <div class="divider"><span>or</span></div>
 
-            <form id="login-form" class="space-y-6">
-                <div class="space-y-2">
-                    <label class="form-label ml-1">Email Address</label>
-                    <input id="login-email" class="form-input" placeholder="name@example.com" type="email" required/>
-                </div>
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center px-1">
-                        <label class="form-label">Password</label>
-                        <a class="text-xs font-medium text-primary hover:text-secondary transition-colors" href="#">Forgot password?</a>
-                    </div>
-                    <input id="login-password" class="form-input" placeholder="••••••••" type="password" required/>
-                </div>
-                <button id="login-btn" class="w-full py-4 px-6 rounded-full signature-gradient text-on-primary font-bold tracking-tight shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all text-lg border-none cursor-pointer" type="submit">
-                    Sign In
-                </button>
-            </form>
+      <button id="google-login-btn" class="btn-google">
+        <svg width="18" height="18" viewBox="0 0 24 24">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.27.81-.57z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
 
-            <div class="relative flex items-center py-2">
-                <div class="flex-grow border-t border-outline-variant/30"></div>
-                <span class="flex-shrink mx-4 text-xs font-bold uppercase tracking-widest text-outline">OR</span>
-                <div class="flex-grow border-t border-outline-variant/30"></div>
-            </div>
+      <p class="signup-row">Don't have an account? <a href="signup.html">Create one free</a></p>
 
-            <button id="google-login-btn" class="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-full bg-white text-slate-800 border-2 border-slate-200 hover:border-slate-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 font-bold text-sm cursor-pointer active:scale-95">
-                <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.27.81-.57z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                Continue with Google
-            </button>
-
-            <p class="text-center text-sm text-on-surface-variant pt-2">
-                Don't have an account? <a class="font-semibold text-primary hover:text-secondary transition-colors" href="signup.html">Create one for free</a>
-            </p>
-        </div>
-    </section>
-</main>
+      <div class="trust-row">
+        <div class="trust-item"><span class="material-symbols-outlined">lock</span>SSL Secured</div>
+        <div class="trust-item"><span class="material-symbols-outlined">shield</span>Private</div>
+        <div class="trust-item"><span class="material-symbols-outlined">verified_user</span>2FA Ready</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="js/data.js"></script>
 <script src="js/api.js"></script>
 <script src="js/main.js"></script>
 <script type="module">
-    import { loginWithGoogle } from './js/firebase-auth.js?v=2';
-    
-    const errorBox = document.getElementById('login-error');
+import { loginWithGoogle } from './js/firebase-auth.js?v=2';
 
-    // Email/Password Login
-    document.getElementById('login-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        errorBox.classList.add('hidden');
-        const btn = document.getElementById('login-btn');
-        const originalText = btn.textContent;
-        btn.innerHTML = '<span class="material-symbols-outlined animate-spin-slow text-lg">sync</span>';
-        btn.disabled = true;
+const errBox = document.getElementById('login-error');
+const errMsg = document.getElementById('err-msg');
 
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
+function showErr(msg){ errMsg.textContent = msg; errBox.classList.add('show'); }
+function hideErr(){ errBox.classList.remove('show'); }
 
-        try {
-            const profile = await AuthAPI.login(email, password);
-            if (typeof showWelcomeAnimation === 'function') {
-                showWelcomeAnimation(profile.name.split(' ')[0]);
-                setTimeout(function() { window.location.href = 'index.html'; }, 2000);
-            } else {
-                setTimeout(function() { window.location.href = 'index.html'; }, 600);
-            }
-        } catch(err) {
-            errorBox.textContent = err.message || 'Login failed. Please check your credentials.';
-            errorBox.classList.remove('hidden');
-            btn.textContent = originalText;
-            btn.disabled = false;
-        }
-    });
+document.getElementById('toggle-pw').addEventListener('click', function(){
+  const inp = document.getElementById('login-password');
+  const ico = document.getElementById('eye-icon');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  ico.textContent = inp.type === 'password' ? 'visibility' : 'visibility_off';
+});
 
-    // Google Login
-    document.getElementById('google-login-btn').addEventListener('click', async function() {
-        const btn = this;
-        const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<span class="material-symbols-outlined animate-spin-slow text-lg">sync</span> Signing in...';
-        btn.disabled = true;
+document.getElementById('login-form').addEventListener('submit', async function(e){
+  e.preventDefault(); hideErr();
+  const btn = document.getElementById('login-btn');
+  btn.innerHTML = '<span class="spin material-symbols-outlined" style="font-size:19px;">sync</span>';
+  btn.disabled = true;
+  try {
+    const profile = await AuthAPI.login(
+      document.getElementById('login-email').value,
+      document.getElementById('login-password').value
+    );
+    btn.innerHTML = '✓ Signed in!';
+    if(typeof showWelcomeAnimation==='function'){
+      showWelcomeAnimation(profile.name.split(' ')[0]);
+      setTimeout(()=>{ window.location.href='index.html'; }, 2000);
+    } else {
+      setTimeout(()=>{ window.location.href='index.html'; }, 600);
+    }
+  } catch(err){
+    showErr(err.message || 'Login failed. Please check your credentials.');
+    btn.innerHTML = 'Sign In'; btn.disabled = false;
+  }
+});
 
-        try {
-            const fbUser = await loginWithGoogle();
-            const profile = await AuthAPI.googleLogin(fbUser.name, fbUser.email, fbUser.uid, fbUser.photoURL);
-            
-            if (typeof showWelcomeAnimation === 'function') {
-                showWelcomeAnimation(profile.name.split(' ')[0]);
-                setTimeout(function() { window.location.href = 'index.html'; }, 2000);
-            } else {
-                setTimeout(function() { window.location.href = 'index.html'; }, 600);
-            }
-        } catch(err) {
-            errorBox.textContent = err.message || 'Google sign-in failed.';
-            errorBox.classList.remove('hidden');
-            btn.innerHTML = originalHTML;
-            btn.disabled = false;
-        }
-    });
+document.getElementById('google-login-btn').addEventListener('click', async function(){
+  const btn = this; const orig = btn.innerHTML;
+  btn.innerHTML = '<span class="spin material-symbols-outlined" style="font-size:18px;">sync</span> Signing in...';
+  btn.disabled = true;
+  try {
+    const fbUser = await loginWithGoogle();
+    const profile = await AuthAPI.googleLogin(fbUser.name, fbUser.email, fbUser.uid, fbUser.photoURL);
+    if(typeof showWelcomeAnimation==='function'){
+      showWelcomeAnimation(profile.name.split(' ')[0]);
+      setTimeout(()=>{ window.location.href='index.html'; }, 2000);
+    } else {
+      setTimeout(()=>{ window.location.href='index.html'; }, 600);
+    }
+  } catch(err){
+    showErr(err.message || 'Google sign-in failed.');
+    btn.innerHTML = orig; btn.disabled = false;
+  }
+});
 </script>
 </body>
 </html>
