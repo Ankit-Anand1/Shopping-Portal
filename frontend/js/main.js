@@ -698,6 +698,7 @@ function initSearchSuggestions() {
 }
 
 // ── Mobile Bottom Navigation Bar ──
+// ── Mobile Bottom Navigation Bar ──
 function renderBottomNav() {
     if (document.getElementById('bottom-nav')) return;
 
@@ -711,16 +712,54 @@ function renderBottomNav() {
         { icon: 'person', label: 'Account', href: 'profile.html', active: currentPage === 'profile.html' || currentPage === 'login.html' || currentPage === 'orders.html' }
     ];
 
+    window.switchNav = function(e, href, label) {
+        e.preventDefault();
+        const links = document.querySelectorAll('#bottom-nav a');
+        links.forEach(a => {
+            const isTarget = a.getAttribute('href') === href;
+            const icon = a.querySelector('.nav-icon');
+            const text = a.querySelector('.nav-text');
+            const badge = a.querySelector('.nav-badge');
+            
+            if (isTarget) {
+                a.className = "relative flex items-center justify-center gap-2 h-12 transition-all duration-300 ease-out rounded-full bg-slate-900 px-5 shadow-md shadow-slate-900/20";
+                icon.style.fontSize = '20px';
+                icon.style.color = '#ffffff';
+                icon.style.fontVariationSettings = "'FILL' 1";
+                if (!text) {
+                    a.insertAdjacentHTML('beforeend', `<span class="nav-text font-extrabold text-[13px] tracking-wide text-white whitespace-nowrap animate-fade-in">${label}</span>`);
+                }
+                if (badge) {
+                    badge.className = "nav-badge absolute top-1.5 right-1.5 w-[18px] h-[18px] rounded-full bg-pink-500 text-white text-[9px] font-bold flex items-center justify-center border-2 transform translate-x-1 -translate-y-1 border-slate-900 transition-all";
+                }
+            } else {
+                a.className = "relative flex items-center justify-center gap-2 h-12 transition-all duration-300 ease-out rounded-full w-12 hover:bg-slate-100/80";
+                icon.style.fontSize = '24px';
+                icon.style.color = '#64748b';
+                icon.style.fontVariationSettings = "normal";
+                if (text) text.remove();
+                if (badge) {
+                    badge.className = "nav-badge absolute top-1.5 right-1.5 w-[18px] h-[18px] rounded-full bg-pink-500 text-white text-[9px] font-bold flex items-center justify-center border-2 transform translate-x-1 -translate-y-1 border-white transition-all";
+                }
+            }
+        });
+        
+        // Wait for animation to start before navigating
+        setTimeout(() => {
+            window.location.href = href;
+        }, 200);
+    };
+
     const nav = document.createElement('div');
     nav.id = 'bottom-nav';
     nav.className = 'md:hidden';
     nav.innerHTML = `
-        <div class="fixed bottom-6 left-4 right-4 z-[200] bg-white/90 backdrop-blur-3xl border border-white/80 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15)] rounded-full flex justify-between items-center p-2">
+        <div class="fixed bottom-6 left-4 right-4 z-[200] bg-white/90 backdrop-blur-lg border border-white/80 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15)] rounded-full flex justify-between items-center p-2" style="transform: translateZ(0); will-change: transform;">
             ${navItems.map(item => `
-                <a href="${item.href}" class="relative flex items-center justify-center gap-2 h-12 transition-all duration-300 ease-out rounded-full ${item.active ? 'bg-slate-900 px-5 shadow-md shadow-slate-900/20' : 'w-12 hover:bg-slate-100/80'}">
-                    <span class="material-symbols-outlined flex-shrink-0" style="font-size: ${item.active ? '20px' : '24px'}; color: ${item.active ? '#ffffff' : '#64748b'}; ${item.active ? "font-variation-settings: 'FILL' 1;" : ''}">${item.icon}</span>
-                    ${item.active ? `<span class="font-extrabold text-[13px] tracking-wide text-white whitespace-nowrap animate-fade-in">${item.label}</span>` : ''}
-                    ${item.badge > 0 ? `<span class="absolute top-1.5 right-1.5 w-[18px] h-[18px] rounded-full bg-pink-500 text-white text-[9px] font-bold flex items-center justify-center border-2 transform translate-x-1 -translate-y-1 ${item.active ? 'border-slate-900' : 'border-white'}">${item.badge}</span>` : ''}
+                <a href="${item.href}" onclick="switchNav(event, '${item.href}', '${item.label}')" class="relative flex items-center justify-center gap-2 h-12 transition-all duration-300 ease-out rounded-full ${item.active ? 'bg-slate-900 px-5 shadow-md shadow-slate-900/20' : 'w-12 hover:bg-slate-100/80'}">
+                    <span class="nav-icon material-symbols-outlined flex-shrink-0 transition-all duration-300" style="font-size: ${item.active ? '20px' : '24px'}; color: ${item.active ? '#ffffff' : '#64748b'}; ${item.active ? "font-variation-settings: 'FILL' 1;" : ''}">${item.icon}</span>
+                    ${item.active ? `<span class="nav-text font-extrabold text-[13px] tracking-wide text-white whitespace-nowrap animate-fade-in">${item.label}</span>` : ''}
+                    ${item.badge > 0 ? `<span class="nav-badge absolute top-1.5 right-1.5 w-[18px] h-[18px] rounded-full bg-pink-500 text-white text-[9px] font-bold flex items-center justify-center border-2 transform translate-x-1 -translate-y-1 transition-all ${item.active ? 'border-slate-900' : 'border-white'}">${item.badge}</span>` : ''}
                 </a>
             `).join('')}
         </div>
