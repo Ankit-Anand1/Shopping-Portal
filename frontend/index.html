@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth overflow-x-hidden">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <title>Smart Shop | Premium E-Commerce</title>
     <meta name="description" content="Discover curated electronics, fashion, and lifestyle essentials."/>
     
@@ -76,25 +76,25 @@
         #navbar > * { pointer-events: auto; }
     </style>
 
-    <main class="flex-grow">
+    <main class="flex-grow overflow-x-hidden">
         
         <!-- Premium SaaS Hero Section -->
         <section class="relative pt-32 lg:pt-48 pb-20 px-4 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
             <!-- Subtle grid background -->
             <div class="absolute inset-0 hero-pattern [mask-image:linear-gradient(to_bottom,white,transparent)] -z-10"></div>
             <!-- Glowing gradient blur -->
-            <div class="absolute left-1/2 top-0 -z-10 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none"></div>
+            <div class="absolute left-1/2 top-0 -z-10 -translate-x-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] rounded-full bg-indigo-500/10 blur-[80px] md:blur-[120px] pointer-events-none"></div>
 
-            <div class="flex-1 space-y-8" data-aos="fade-up">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50/80 backdrop-blur-md border border-indigo-100/50 text-indigo-600 text-sm font-semibold shadow-sm">
-                    <span class="flex h-2 w-2 relative">
+            <div class="flex-1 space-y-8 max-w-full" data-aos="fade-up">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50/80 backdrop-blur-md border border-indigo-100/50 text-indigo-600 text-sm font-semibold shadow-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+                    <span class="flex h-2 w-2 relative shrink-0">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                       <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
                     </span>
-                    Smart Shop 2.0 is Live
+                    <span class="truncate">Smart Shop 2.0 is Live</span>
                 </div>
                 
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 font-heading leading-[1.1]">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 font-heading leading-[1.1] break-words">
                     The new standard <br class="hidden lg:block"/> in <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">online shopping.</span>
                 </h1>
                 
@@ -186,7 +186,7 @@
         </section>
 
         <!-- Brand Marquee -->
-        <section class="py-8 border-y border-slate-100 bg-slate-50 overflow-hidden flex whitespace-nowrap">
+        <section class="py-8 border-y border-slate-100 bg-slate-50 overflow-hidden w-full whitespace-nowrap block">
             <div class="animate-scroll flex gap-20 items-center w-max px-10">
                 <!-- Repeated blocks for infinite scroll effect -->
                 <div class="flex items-center gap-20">

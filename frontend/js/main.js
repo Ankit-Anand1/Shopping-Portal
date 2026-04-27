@@ -540,46 +540,87 @@ function renderFooter() {
     const footer = document.getElementById('footer-container');
     if (!footer) return;
 
-    footer.className = "bg-slate-50 w-full py-12 px-8 mt-12 mb-20 md:mb-0 rounded-t-[2.5rem] md:rounded-none shadow-[0_-10px_40px_rgb(0,0,0,0.02)]";
+    footer.className = "";
     footer.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto text-sm leading-relaxed">
-            <div class="space-y-4">
-                <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-md signature-gradient flex items-center justify-center"><span class="material-symbols-outlined text-white text-sm" style="font-variation-settings: 'FILL' 1;">storefront</span></div>
-                    <span class="text-lg font-extrabold text-slate-900">Smart Shop</span>
+        <div class="relative bg-slate-900 w-full py-16 px-8 mt-12 md:mb-0 mb-20 rounded-t-[3rem] overflow-hidden">
+            <!-- Background glow elements -->
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 max-w-7xl mx-auto relative z-10 text-sm">
+                
+                <!-- Brand & Newsletter (Col span 4) -->
+                <div class="md:col-span-4 space-y-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                            <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">storefront</span>
+                        </div>
+                        <span class="text-2xl font-black text-white font-heading tracking-tight">Smart Shop</span>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed max-w-xs font-body">
+                        The modern standard for e-commerce. Discover curated electronics, premium fashion, and everyday essentials.
+                    </p>
+                    
+                    <!-- Newsletter -->
+                    <div class="relative max-w-xs group mt-4">
+                        <input type="email" placeholder="Subscribe to updates" class="w-full bg-slate-800/50 border border-slate-700 rounded-full py-3.5 pl-5 pr-14 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner">
+                        <button class="absolute right-1.5 top-1.5 bottom-1.5 w-10 bg-indigo-600 rounded-full flex items-center justify-center hover:bg-indigo-500 transition-colors shadow-md group-focus-within:bg-indigo-500">
+                            <span class="material-symbols-outlined text-white text-[18px]">arrow_forward</span>
+                        </button>
+                    </div>
                 </div>
-                <p class="text-slate-500 max-w-xs">Crafting a premium shopping experience with curated electronics, fashion, and lifestyle essentials.</p>
-                <div class="flex gap-3">
-                    <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center cursor-pointer hover:bg-primary hover:text-white transition-colors"><span class="material-symbols-outlined text-sm">public</span></div>
-                    <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center cursor-pointer hover:bg-primary hover:text-white transition-colors"><span class="material-symbols-outlined text-sm">alternate_email</span></div>
-                    <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center cursor-pointer hover:bg-primary hover:text-white transition-colors"><span class="material-symbols-outlined text-sm">share</span></div>
+                
+                <!-- Links (Col span 2 each) -->
+                <div class="md:col-span-2 flex flex-col gap-4 pt-2">
+                    <h4 class="font-bold text-white text-base font-heading mb-2">Product</h4>
+                    <a class="text-slate-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 block font-medium" href="#">Features</a>
+                    <a class="text-slate-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 block font-medium" href="#">Pricing</a>
+                    <a class="text-slate-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 block font-medium" href="#">Integrations</a>
+                    <a class="text-slate-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 block font-medium flex items-center gap-2" href="#">
+                        Changelog <span class="inline-block px-1.5 py-0.5 bg-indigo-500/20 text-indigo-300 text-[9px] uppercase tracking-widest font-bold rounded-md">New</span>
+                    </a>
+                </div>
+                
+                <div class="md:col-span-2 flex flex-col gap-4 pt-2">
+                    <h4 class="font-bold text-white text-base font-heading mb-2">Company</h4>
+                    <a class="text-slate-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 block font-medium" href="#">About Us</a>
+                    <a class="text-slate-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 block font-medium" href="#">Careers</a>
+                    <a class="text-slate-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 block font-medium" href="#">Contact</a>
+                    <a class="text-slate-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 block font-medium" href="#">Partners</a>
+                </div>
+                
+                <div class="md:col-span-2 flex flex-col gap-4 pt-2">
+                    <h4 class="font-bold text-white text-base font-heading mb-2">Legal</h4>
+                    <a class="text-slate-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 block font-medium" href="#">Privacy Policy</a>
+                    <a class="text-slate-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 block font-medium" href="#">Terms of Service</a>
+                    <a class="text-slate-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 block font-medium" href="#">Cookie Policy</a>
+                    <a class="text-slate-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 block font-medium" href="#">Security</a>
                 </div>
             </div>
-            <div class="flex flex-col gap-3">
-                <h4 class="font-bold text-slate-900 mb-2">Company</h4>
-                <a class="text-slate-500 hover:text-indigo-500 hover:translate-x-1 transition-transform duration-200 block" href="#">About Us</a>
-                <a class="text-slate-500 hover:text-indigo-500 hover:translate-x-1 transition-transform duration-200 block" href="#">Careers</a>
-                <a class="text-slate-500 hover:text-indigo-500 hover:translate-x-1 transition-transform duration-200 block" href="#">Sustainability</a>
-            </div>
-            <div class="flex flex-col gap-3">
-                <h4 class="font-bold text-slate-900 mb-2">Help</h4>
-                <a class="text-slate-500 hover:text-indigo-500 hover:translate-x-1 transition-transform duration-200 block" href="#">Support Center</a>
-                <a class="text-slate-500 hover:text-indigo-500 hover:translate-x-1 transition-transform duration-200 block" href="#">Shipping Policy</a>
-                <a class="text-slate-500 hover:text-indigo-500 hover:translate-x-1 transition-transform duration-200 block" href="#">Returns & Refunds</a>
-            </div>
-            <div class="flex flex-col gap-3">
-                <h4 class="font-bold text-slate-900 mb-2">Resources</h4>
-                <a class="text-slate-500 hover:text-indigo-500 hover:translate-x-1 transition-transform duration-200 block" href="#">Gift Cards</a>
-                <a class="text-slate-500 hover:text-indigo-500 hover:translate-x-1 transition-transform duration-200 block" href="#">Store Locator</a>
-                <a class="text-slate-500 hover:text-indigo-500 hover:translate-x-1 transition-transform duration-200 block" href="#">Join the Circle</a>
-            </div>
-        </div>
-        <div class="max-w-7xl mx-auto border-t border-slate-200/50 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-slate-400 text-xs">© 2026 Smart Shop. All rights reserved.</p>
-            <div class="flex gap-8 text-xs text-slate-400">
-                <a class="hover:text-indigo-500" href="#">Privacy Policy</a>
-                <a class="hover:text-indigo-500" href="#">Terms of Service</a>
-                <a class="hover:text-indigo-500" href="#">Cookie Settings</a>
+            
+            <!-- Footer Bottom -->
+            <div class="max-w-7xl mx-auto border-t border-slate-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
+                <p class="text-slate-500 text-sm font-medium">© 2026 Smart Shop Inc. All rights reserved.</p>
+                
+                <!-- Social Icons -->
+                <div class="flex gap-4">
+                    <!-- Twitter/X -->
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-slate-700 hover:text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-800/50">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </a>
+                    <!-- GitHub -->
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-slate-700 hover:text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-800/50">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                    </a>
+                    <!-- Instagram -->
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-[#E1306C] hover:text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-pink-500/20">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                    </a>
+                    <!-- LinkedIn -->
+                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-[#0077B5] hover:text-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/20">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    </a>
+                </div>
             </div>
         </div>
     `;
