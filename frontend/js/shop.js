@@ -62,12 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     'mens-shirts': 'Clothes', 'mens-shoes': 'Clothes', 'womens-dresses': 'Clothes',
                     'womens-shoes': 'Clothes', 'womens-bags': 'Accessories', 'womens-jewellery': 'Accessories',
                     'mens-watches': 'Accessories', 'womens-watches': 'Accessories', 'sunglasses': 'Accessories',
-                    'tops': 'Clothes', 'fragrances': 'Accessories', 'skincare': 'Grocery',
+                    'tops': 'Clothes', 'fragrances': 'Accessories', 'skincare': 'Accessories',
                     'groceries': 'Grocery', 'home-decoration': 'Accessories',
                     'furniture': 'Accessories', 'lighting': 'Accessories',
                     'automotive': 'Accessories', 'motorcycle': 'Accessories',
                     'tablets': 'Laptops', 'mobile-accessories': 'Accessories',
-                    'kitchen-accessories': 'Grocery', 'sports-accessories': 'Accessories',
+                    'kitchen-accessories': 'Accessories', 'sports-accessories': 'Accessories',
                     'vehicle': 'Accessories'
                 };
                 

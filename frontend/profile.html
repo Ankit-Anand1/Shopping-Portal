@@ -106,10 +106,66 @@
                     </div>
                 </div>
                 
-                <!-- Address Field -->
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Delivery Address</label>
-                    <input type="text" id="p-address" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3.5 text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all" placeholder="123, MG Road, Sector 5"/>
+                <!-- Address Management -->
+                <div class="pt-4 border-t border-slate-100 mt-4">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-indigo-500">home_pin</span> Saved Addresses
+                    </h3>
+                    <div id="saved-address-list" class="space-y-3 mb-4">
+                        <!-- Addresses rendered here -->
+                    </div>
+                    
+                    <!-- Add new address form -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200" id="add-addr-form" style="display:none;">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">New Address Details</p>
+                        
+                        <!-- Row 1: Type + Phone -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 ml-1">Type</label>
+                                <select id="new-addr-type" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 outline-none focus:border-indigo-400">
+                                    <option value="Home">🏠 Home</option>
+                                    <option value="Work">💼 Work</option>
+                                    <option value="Other">📍 Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 ml-1">Phone Number</label>
+                                <input type="tel" id="new-addr-phone" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-400" placeholder="+91 98765 43210"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Row 2: Street -->
+                        <div class="mb-4">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 ml-1">Street Address</label>
+                            <input type="text" id="new-addr-street" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-400" placeholder="123, MG Road, Apartment 4B"/>
+                        </div>
+                        
+                        <!-- Row 3: City + State + PIN -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 ml-1">City</label>
+                                <input type="text" id="new-addr-city" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-400" placeholder="Mumbai"/>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 ml-1">State</label>
+                                <input type="text" id="new-addr-state" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-400" placeholder="Maharashtra"/>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 ml-1">PIN Code</label>
+                                <input type="text" id="new-addr-pin" class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-400" placeholder="400001"/>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <button type="button" onclick="saveNewAddress()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">save</span>Save Address</button>
+                            <button type="button" onclick="document.getElementById('add-addr-form').style.display='none'" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-300">Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <button type="button" id="show-add-addr-btn" onclick="document.getElementById('add-addr-form').style.display='block'" class="text-indigo-600 text-xs font-bold flex items-center gap-1 hover:text-indigo-800 transition-colors mt-2" style="display: none;">
+                        <span class="material-symbols-outlined text-[16px]">add_circle</span> Add New Address
+                    </button>
                 </div>
                 
                 <div class="flex items-center gap-4 pt-6 mt-2 border-t border-slate-100">
@@ -166,7 +222,8 @@
             document.getElementById('p-email').value = profile.email || '';
             document.getElementById('p-phone').value = profile.phone || '';
             document.getElementById('p-city').value = profile.city || '';
-            document.getElementById('p-address').value = savedAddress || '';
+            
+            renderAddresses();
             
             document.getElementById('stat-orders').textContent = getOrders().length;
             document.getElementById('stat-wishlist').textContent = getWishlist().length;
@@ -180,7 +237,7 @@
         
         // FIX #3: Lock fields after save
         function lockFields() {
-            const fields = ['p-name', 'p-email', 'p-phone', 'p-city', 'p-address'];
+            const fields = ['p-name', 'p-email', 'p-phone', 'p-city'];
             fields.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
@@ -190,12 +247,15 @@
             });
             document.getElementById('save-btn').style.display = 'none';
             document.getElementById('edit-btn').style.display = 'flex';
+            document.getElementById('show-add-addr-btn').style.display = 'none';
+            document.getElementById('add-addr-form').style.display = 'none';
             isEditing = false;
+            renderAddresses(); // re-render without delete buttons
         }
         
         // FIX #3: Enable editing
         function enableEdit() {
-            const fields = ['p-name', 'p-email', 'p-phone', 'p-city', 'p-address'];
+            const fields = ['p-name', 'p-email', 'p-phone', 'p-city'];
             fields.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
@@ -206,8 +266,86 @@
             document.getElementById('save-btn').style.display = 'inline-flex';
             document.getElementById('edit-btn').style.display = 'none';
             document.getElementById('save-status').classList.add('hidden');
-            document.getElementById('p-name').focus();
+            document.getElementById('show-add-addr-btn').style.display = 'flex';
             isEditing = true;
+            renderAddresses(); // re-render with delete buttons
+        }
+        
+        function renderAddresses() {
+            const addresses = getAddresses();
+            const list = document.getElementById('saved-address-list');
+            list.innerHTML = '';
+            
+            // Legacy check
+            const oldAddr = getAddress();
+            if (addresses.length === 0 && oldAddr) {
+                addresses.push({ type: 'Home', address: oldAddr, city: 'Unknown' });
+                saveAddresses(addresses);
+            }
+            
+            if (addresses.length === 0) {
+                list.innerHTML = '<p class="text-xs text-slate-400">No saved addresses.</p>';
+                return;
+            }
+            
+            addresses.forEach((addr, idx) => {
+                const icon = addr.type === 'Work' ? 'work' : addr.type === 'Home' ? 'home' : 'location_on';
+                const badge = addr.type === 'Work' ? 'bg-blue-50 text-blue-600' : addr.type === 'Home' ? 'bg-green-50 text-green-600' : 'bg-slate-50 text-slate-600';
+                list.innerHTML += `
+                    <div class="flex items-start justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0 text-indigo-500 mt-0.5">
+                                <span class="material-symbols-outlined text-[18px]">${icon}</span>
+                            </div>
+                            <div>
+                                <span class="inline-block text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md mb-1 ${badge}">${addr.type}</span>
+                                <p class="text-sm font-semibold text-slate-800">${addr.address}</p>
+                                <p class="text-xs text-slate-500 mt-0.5">${addr.city}${addr.state ? ', ' + addr.state : ''}${addr.pin ? ' - ' + addr.pin : ''}</p>
+                                ${addr.phone ? `<p class="text-xs text-slate-400 mt-0.5">📞 ${addr.phone}</p>` : ''}
+                            </div>
+                        </div>
+                        ${isEditing ? `
+                        <button type="button" onclick="deleteAddress(${idx})" class="w-8 h-8 rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors flex-shrink-0 ml-2">
+                            <span class="material-symbols-outlined text-[16px]">delete</span>
+                        </button>
+                        ` : ''}
+                    </div>
+                `;
+            });
+        }
+        
+        function saveNewAddress() {
+            const type = document.getElementById('new-addr-type').value;
+            const phone = document.getElementById('new-addr-phone').value.trim();
+            const street = document.getElementById('new-addr-street').value.trim();
+            const city = document.getElementById('new-addr-city').value.trim();
+            const state = document.getElementById('new-addr-state').value.trim();
+            const pin = document.getElementById('new-addr-pin').value.trim();
+            
+            if (!city || !street) {
+                showToast('Missing Info', 'Please enter city and street address.', 'warning', 'orange');
+                return;
+            }
+            
+            const addresses = getAddresses();
+            addresses.push({ type, phone, address: street, city, state, pin });
+            saveAddresses(addresses);
+            
+            // Clear form
+            ['new-addr-phone','new-addr-street','new-addr-city','new-addr-state','new-addr-pin'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('add-addr-form').style.display = 'none';
+            renderAddresses();
+            showToast('Address Saved', 'New delivery address added.', 'location_on', 'blue');
+        }
+        
+        function deleteAddress(idx) {
+            if (!confirm('Delete this address?')) return;
+            const addresses = getAddresses();
+            addresses.splice(idx, 1);
+            saveAddresses(addresses);
+            renderAddresses();
         }
         
         document.getElementById('profile-form').addEventListener('submit', async (e) => {
@@ -218,11 +356,9 @@
                 phone: document.getElementById('p-phone').value,
                 city: document.getElementById('p-city').value,
             };
-            const addr = document.getElementById('p-address').value;
 
             // Save to localStorage (always works)
             saveProfile(profileData);
-            if (addr) saveAddress(addr);
 
             // Also save to backend if API available
             if (typeof AuthAPI !== 'undefined') {
@@ -231,7 +367,7 @@
                         name: profileData.name,
                         phone: profileData.phone,
                         address: {
-                            street: addr,
+                            street: getAddresses()[0]?.address || '',
                             city: profileData.city,
                             state: '',
                             zipCode: ''

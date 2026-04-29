@@ -45,7 +45,8 @@ function loadCart() {
         const product = getProductById(item.productId);
         if (!product) return;
         
-        const amount = product.price * item.quantity;
+        const m = item.weight === '50g' ? 0.05 : item.weight === '100g' ? 0.1 : item.weight === '250g' ? 0.25 : item.weight === '500g' ? 0.5 : 1;
+        const amount = product.price * m * item.quantity;
         total += amount;
         
         container.innerHTML += `
@@ -59,19 +60,20 @@ function loadCart() {
                     <div>
                         <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-[0.2em] mb-1.5 block bg-indigo-50 w-fit px-2 py-0.5 rounded-md border border-indigo-100/50">${product.brand}</span>
                         <h3 class="text-lg md:text-xl font-extrabold tracking-tight text-slate-800 cursor-pointer hover:text-indigo-600 transition-colors font-heading leading-tight" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${product.name}</h3>
+                        ${item.weight ? `<span class="inline-block mt-1 px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded">Weight: ${item.weight}</span>` : ''}
                     </div>
-                    <button onclick="removeFromCart('${product.id}'); loadCart();" class="text-slate-300 hover:text-red-500 transition-all p-2 rounded-full hover:bg-red-50 flex-shrink-0 group/del">
+                    <button onclick="removeFromCart('${product.id}', ${item.weight ? `'${item.weight}'` : 'null'}); loadCart();" class="text-slate-300 hover:text-red-500 transition-all p-2 rounded-full hover:bg-red-50 flex-shrink-0 group/del">
                         <span class="material-symbols-outlined group-hover/del:scale-110 transition-transform">delete</span>
                     </button>
                 </div>
                 
                 <div class="flex flex-wrap items-end justify-between mt-6 gap-4">
                     <div class="flex items-center bg-slate-50 rounded-[1rem] p-1 border border-slate-200 shadow-sm">
-                        <button onclick="updateCartQty('${product.id}', ${item.quantity - 1}); loadCart();" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:text-slate-900 transition-all hover:shadow-sm">
+                        <button onclick="updateCartQty('${product.id}', ${item.quantity - 1}, ${item.weight ? `'${item.weight}'` : 'null'}); loadCart();" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:text-slate-900 transition-all hover:shadow-sm">
                             <span class="material-symbols-outlined text-[16px]">remove</span>
                         </button>
                         <span class="w-10 text-center font-extrabold text-slate-900">${item.quantity}</span>
-                        <button onclick="updateCartQty('${product.id}', ${item.quantity + 1}); loadCart();" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:text-slate-900 transition-all hover:shadow-sm">
+                        <button onclick="updateCartQty('${product.id}', ${item.quantity + 1}, ${item.weight ? `'${item.weight}'` : 'null'}); loadCart();" class="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:bg-white hover:text-slate-900 transition-all hover:shadow-sm">
                             <span class="material-symbols-outlined text-[16px]">add</span>
                         </button>
                     </div>

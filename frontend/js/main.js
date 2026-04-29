@@ -37,6 +37,12 @@ function getAddress() {
 function saveAddress(addr) {
     localStorage.setItem('smartshop_address', addr);
 }
+function getAddresses() {
+    return JSON.parse(localStorage.getItem('smartshop_addresses') || '[]');
+}
+function saveAddresses(addrs) {
+    localStorage.setItem('smartshop_addresses', JSON.stringify(addrs));
+}
 
 // ── Product Reviews per product (user-submitted) ──
 function getProductReviews(productId) {
@@ -72,7 +78,7 @@ function getProductById(id) {
 }
 
 // ── Cart Operations ──
-function addToCart(productId, quantity = 1) {
+function addToCart(productId, quantity = 1, weight = null) {
     if (!getProfile()) {
         showToast('Login Required', 'Please log in to add items to your cart.', 'lock', 'red');
         setTimeout(() => window.location.href = 'login.html', 1500);
@@ -80,11 +86,11 @@ function addToCart(productId, quantity = 1) {
     }
 
     const cart = getCart();
-    const existing = cart.find(item => item.productId === productId);
+    const existing = cart.find(item => item.productId === productId && item.weight === weight);
     if (existing) {
         existing.quantity += quantity;
     } else {
-        cart.push({ productId, quantity });
+        cart.push({ productId, quantity, weight });
     }
     saveCart(cart);
     updateCartCount();
@@ -93,18 +99,18 @@ function addToCart(productId, quantity = 1) {
     if (typeof CartAPI !== 'undefined') { CartAPI.add(productId, quantity).catch(() => { }); }
 }
 
-function removeFromCart(productId) {
+function removeFromCart(productId, weight = null) {
     let cart = getCart();
-    cart = cart.filter(item => item.productId !== productId);
+    cart = cart.filter(item => !(item.productId === productId && item.weight === weight));
     saveCart(cart);
     updateCartCount();
     if (typeof CartAPI !== 'undefined') { CartAPI.remove(productId).catch(() => { }); }
 }
 
-function updateCartQty(productId, quantity) {
-    if (quantity < 1) return removeFromCart(productId);
+function updateCartQty(productId, quantity, weight = null) {
+    if (quantity < 1) return removeFromCart(productId, weight);
     const cart = getCart();
-    const item = cart.find(i => i.productId === productId);
+    const item = cart.find(i => i.productId === productId && i.weight === weight);
     if (item) {
         item.quantity = quantity;
         saveCart(cart);
@@ -116,7 +122,8 @@ function getCartTotal() {
     const cart = getCart();
     return cart.reduce((sum, item) => {
         const product = getProductById(item.productId);
-        return sum + (product ? product.price * item.quantity : 0);
+        const m = item.weight === '50g' ? 0.05 : item.weight === '100g' ? 0.1 : item.weight === '250g' ? 0.25 : item.weight === '500g' ? 0.5 : 1;
+        return sum + (product ? product.price * m * item.quantity : 0);
     }, 0);
 }
 
@@ -328,13 +335,38 @@ function generateProductCard(p) {
             
             <h4 class="text-[14px] font-extrabold text-slate-800 leading-snug mb-3 font-heading group-hover:text-indigo-600 transition-colors" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.name}</h4>
             
+            ${p.category === 'Grocery' ? `
+            <div class="mb-3">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Select Weight</span>
+                    <span id="price-display-${p.id}" class="text-sm font-black text-indigo-600">${formatPrice(p.price)}</span>
+                </div>
+                <select onclick="event.stopPropagation()" id="weight-${p.id}"
+                    onchange="(function(sel){
+                        var m = sel.value==='50g'?0.05:sel.value==='100g'?0.1:sel.value==='250g'?0.25:sel.value==='500g'?0.5:1;
+                        var pd = document.getElementById('price-display-${p.id}');
+                        if(pd) pd.textContent = formatPrice(${p.price} * m);
+                    })(this)"
+                    class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-1.5 outline-none cursor-pointer">
+                    <option value="50g">50g</option>
+                    <option value="100g">100g</option>
+                    <option value="250g">250g</option>
+                    <option value="500g">500g</option>
+                    <option value="1kg" selected>1kg</option>
+                </select>
+            </div>
+            ` : ''}
+
             <div class="mt-auto flex items-end justify-between">
                 <div class="flex flex-col">
                     ${discount > 0 ? `<span class="text-[11px] text-slate-400 line-through font-semibold">${formatPrice(p.originalPrice)}</span>` : ''}
-                    <span class="text-lg font-black text-slate-900 font-heading tracking-tight leading-none">${formatPrice(p.price)}</span>
+                    ${p.category === 'Grocery'
+                        ? `<span class="text-lg font-black text-slate-900 font-heading tracking-tight leading-none" id="price-static-${p.id}">${formatPrice(p.price)}</span>`
+                        : `<span class="text-lg font-black text-slate-900 font-heading tracking-tight leading-none">${formatPrice(p.price)}</span>`
+                    }
                 </div>
                 
-                <button onclick="event.stopPropagation(); addToCart('${p.id}', 1)" class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/20 group-hover:bg-indigo-600 group-hover:shadow-indigo-600/30 transition-all hover:-translate-y-1 z-20">
+                <button onclick="event.stopPropagation(); addToCart('${p.id}', 1, document.getElementById('weight-${p.id}') ? document.getElementById('weight-${p.id}').value : null)" class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/20 group-hover:bg-indigo-600 group-hover:shadow-indigo-600/30 transition-all hover:-translate-y-1 z-20">
                     <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
                 </button>
             </div>
